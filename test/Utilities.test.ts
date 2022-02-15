@@ -6,4 +6,9 @@ describe('The Mods Helper', () => {
 		const parsed = Mods.parseCode(code);
 		expect(parsed).toBe('HDDT');
 	});
+
+	it('can parse a string into a mod code', () => {
+		const code = Mods.parseString('HDDT');
+		expect(code).toBe(Mods.numCodes.HD + Mods.numCodes.DT);
+	});
 });

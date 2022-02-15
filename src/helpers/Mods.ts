@@ -32,6 +32,19 @@ class Mods {
 		// Return the mod selection or NM
 		return output.length !== 0 ? output.join('') : 'NM';
 	}
+
+	public static parseString(str: string): number {
+		// Break up the string into two character pairs
+		const mods = [...str.match(/.{1,2}/g)];
+		if (!mods) return undefined;
+
+		// Calculate the final mod code value
+		return mods.reduce((a, b) => {
+			if (typeof a === 'string') a = modNumCodes[a];
+
+			return a + modNumCodes[b];
+		}, 0);
+	}
 }
 
 namespace Mods {
