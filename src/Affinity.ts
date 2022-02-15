@@ -1,10 +1,12 @@
 import axios, { Axios } from 'axios';
+import { Mode } from './constants';
+import _ from 'lodash';
 
-export default class {
+// todo: comments
+class Affinity {
 	private clientId: number;
 	private clientSecret: string;
 	private loggedIn: boolean = false;
-	private token: string;
 
 	private rest: Axios;
 
@@ -28,8 +30,6 @@ export default class {
 				scope: 'public',
 			});
 
-			this.token = access_token;
-
 			if (access_token) {
 				// Create a new axios REST client
 				this.rest = axios.create({
@@ -39,12 +39,116 @@ export default class {
 					},
 				});
 
-				this.loggedIn = true;
+				// Ensure that all properties are camel case
+				const camelCase = (object: Object) => {
+					let newObject = {};
 
-				return true;
-			} else return false;
-		} else {
-			return true;
+					for (const key in object) {
+						if (
+							typeof object[key] === 'object' &&
+							!Array.isArray(object[key])
+						) {
+							newObject[_.camelCase(key)] = camelCase(
+								object[key]
+							);
+						} else {
+							newObject[_.camelCase(key)] = object[key];
+						}
+					}
+
+					return newObject;
+				};
+
+				this.rest.interceptors.response.use((response) => {
+					response.data = camelCase(response.data);
+
+					return response;
+				});
+
+				this.loggedIn = true;
+			}
 		}
+
+		return this.loggedIn;
+	}
+
+	async getUser(
+		query: string | number,
+		mode: Mode = Mode.Standard
+	): Promise<Affinity.User> {
+		const { data } = await this.rest.get(
+			`users/${query}/${mode}?key=${
+				typeof query === 'number' ? 'id' : 'username'
+			}`
+		);
+
+		return {
+			id: data.id,
+			username: data.username,
+			avatar: data.avatarUrl,
+			coverUrl: data.coverUrl,
+			joinDate: new Date(data.joinDate),
+			playstyle: data.playstyle,
+
+			kudosu: data.kudosu,
+
+			profile: {
+				occupation: data.occupation,
+				website: data.website,
+				discord: data.discord,
+				followers: data.followerCount,
+				previousNames: data.previousUsernames,
+			},
+
+			country: data.country,
+
+			information: {
+				active: data.isActive,
+				bot: data.isBot,
+				online: data.isOnline,
+				supporter: data.isSupporter,
+				hasSupported: data.hasSupported,
+			},
+
+			statistics: {
+				level: data.statistics.level.current,
+				globalRank: data.statistics.globalRank,
+				pp: data.statistics.pp,
+				rankedScore: data.statistics.rankedScore,
+				hitAccuracy: data.statistics.hitAccuracy,
+				playCount: data.statistics.playCount,
+				playTime: data.statistics.playTime,
+				totalScore: data.statistics.totalScore,
+				totalHits: data.statistics.totalHits,
+				maximumCombo: data.statistics.maximumCombo,
+				rankCounts: data.statistics.gradeCounts,
+				countryRank: data.statistics.countryRank,
+			},
+
+			badges: data.badges?.map(({ awardedAt, ...data }) => {
+				return {
+					...data,
+					awardedAt: new Date(awardedAt),
+				};
+			}),
+
+			playcounts: data.monthlyPlaycounts.map((p) => {
+				return {
+					startDate: p.start_date,
+					count: p.count,
+				};
+			}),
+
+			achievements: data.userAchievements.map((a) => {
+				return {
+					id: a.achievement_id,
+					achievedAt: new Date(a.achieved_at),
+				};
+			}),
+
+			rankHistory: data.rankHistory,
+		};
 	}
 }
+
+export default Affinity;
