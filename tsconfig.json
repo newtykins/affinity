@@ -8,7 +8,9 @@
 		"skipLibCheck": true,
 		"baseUrl": "./src",
 		"paths": {
-			"~structures/*": ["./structures/*"]
+			"~structures/*": ["./structures/*"],
+			"~helpers/*": ["./helpers/*"],
+			"~affinity": ["./index.ts"]
 		},
 		"plugins": [{ "transform": "ts-transform-paths" }]
 	}

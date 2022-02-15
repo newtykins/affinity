@@ -1,13 +1,7 @@
 import axios, { Axios } from 'axios';
 import _ from 'lodash';
 import User from '~structures/User';
-
-enum Modes {
-	CTB = 'fruits',
-	Mania = 'mania',
-	Standard = 'osu',
-	Taiko = 'taiko',
-}
+import { Modes } from './constants';
 
 // todo: comments
 class Affinity {

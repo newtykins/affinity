@@ -1,4 +1,4 @@
-import Affinity from '../src/Affinity';
+import Affinity from '~affinity';
 
 describe('The Affinity Client', () => {
 	let client: Affinity;
