@@ -1,16 +1,26 @@
 import axios, { Axios } from 'axios';
-import { Mode } from './constants';
 import _ from 'lodash';
+
+enum Modes {
+	CTB = 'fruits',
+	Mania = 'mania',
+	Standard = 'osu',
+	Taiko = 'taiko',
+}
 
 // todo: comments
 class Affinity {
 	private clientId: number;
 	private clientSecret: string;
 	private loggedIn: boolean = false;
-
 	private rest: Axios;
+	static Modes = Modes;
 
 	constructor(clientId: number, clientSecret: string) {
+		if (!clientId)
+			throw new Error('You must provide an ID for the client!');
+		if (!clientSecret) throw new Error('You must provide a client secret!');
+
 		this.clientId = clientId;
 		this.clientSecret = clientSecret;
 	}
@@ -74,80 +84,86 @@ class Affinity {
 
 	async getUser(
 		query: string | number,
-		mode: Mode = Mode.Standard
+		mode: Modes = Affinity.Modes.Standard
 	): Promise<Affinity.User> {
-		const { data } = await this.rest.get(
-			`users/${query}/${mode}?key=${
-				typeof query === 'number' ? 'id' : 'username'
-			}`
-		);
+		if (this.loggedIn) {
+			const { data } = await this.rest.get(
+				`users/${query}/${mode}?key=${
+					typeof query === 'number' ? 'id' : 'username'
+				}`
+			);
 
-		return {
-			id: data.id,
-			username: data.username,
-			avatar: data.avatarUrl,
-			coverUrl: data.coverUrl,
-			joinDate: new Date(data.joinDate),
-			playstyle: data.playstyle,
+			return {
+				id: data.id,
+				username: data.username,
+				avatar: data.avatarUrl,
+				coverUrl: data.coverUrl,
+				joinDate: new Date(data.joinDate),
+				playstyle: data.playstyle,
 
-			kudosu: data.kudosu,
+				kudosu: data.kudosu,
 
-			profile: {
-				occupation: data.occupation,
-				website: data.website,
-				discord: data.discord,
-				followers: data.followerCount,
-				previousNames: data.previousUsernames,
-			},
+				profile: {
+					occupation: data.occupation,
+					website: data.website,
+					discord: data.discord,
+					followers: data.followerCount,
+					previousNames: data.previousUsernames,
+				},
 
-			country: data.country,
+				country: data.country,
 
-			information: {
-				active: data.isActive,
-				bot: data.isBot,
-				online: data.isOnline,
-				supporter: data.isSupporter,
-				hasSupported: data.hasSupported,
-			},
+				information: {
+					active: data.isActive,
+					bot: data.isBot,
+					online: data.isOnline,
+					supporter: data.isSupporter,
+					hasSupported: data.hasSupported,
+				},
 
-			statistics: {
-				level: data.statistics.level.current,
-				globalRank: data.statistics.globalRank,
-				pp: data.statistics.pp,
-				rankedScore: data.statistics.rankedScore,
-				hitAccuracy: data.statistics.hitAccuracy,
-				playCount: data.statistics.playCount,
-				playTime: data.statistics.playTime,
-				totalScore: data.statistics.totalScore,
-				totalHits: data.statistics.totalHits,
-				maximumCombo: data.statistics.maximumCombo,
-				rankCounts: data.statistics.gradeCounts,
-				countryRank: data.statistics.countryRank,
-			},
+				statistics: {
+					level: data.statistics.level.current,
+					globalRank: data.statistics.globalRank,
+					pp: data.statistics.pp,
+					rankedScore: data.statistics.rankedScore,
+					hitAccuracy: data.statistics.hitAccuracy,
+					playCount: data.statistics.playCount,
+					playTime: data.statistics.playTime,
+					totalScore: data.statistics.totalScore,
+					totalHits: data.statistics.totalHits,
+					maximumCombo: data.statistics.maximumCombo,
+					rankCounts: data.statistics.gradeCounts,
+					countryRank: data.statistics.countryRank,
+				},
 
-			badges: data.badges?.map(({ awardedAt, ...data }) => {
-				return {
-					...data,
-					awardedAt: new Date(awardedAt),
-				};
-			}),
+				badges: data.badges?.map(({ awardedAt, ...data }) => {
+					return {
+						...data,
+						awardedAt: new Date(awardedAt),
+					};
+				}),
 
-			playcounts: data.monthlyPlaycounts.map((p) => {
-				return {
-					startDate: p.start_date,
-					count: p.count,
-				};
-			}),
+				playcounts: data.monthlyPlaycounts.map((p) => {
+					return {
+						startDate: p.start_date,
+						count: p.count,
+					};
+				}),
 
-			achievements: data.userAchievements.map((a) => {
-				return {
-					id: a.achievement_id,
-					achievedAt: new Date(a.achieved_at),
-				};
-			}),
+				achievements: data.userAchievements.map((a) => {
+					return {
+						id: a.achievement_id,
+						achievedAt: new Date(a.achieved_at),
+					};
+				}),
 
-			rankHistory: data.rankHistory,
-		};
+				rankHistory: data.rankHistory,
+			};
+		} else {
+			throw new Error(
+				'You must be logged in to fetch data about a user!'
+			);
+		}
 	}
 }
 
