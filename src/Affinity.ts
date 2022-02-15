@@ -1,5 +1,6 @@
 import axios, { Axios } from 'axios';
 import _ from 'lodash';
+import User from '~structures/User';
 
 enum Modes {
 	CTB = 'fruits',
@@ -85,7 +86,7 @@ class Affinity {
 	async getUser(
 		query: string | number,
 		mode: Modes = Affinity.Modes.Standard
-	): Promise<Affinity.User> {
+	): Promise<User> {
 		if (this.loggedIn) {
 			const { data } = await this.rest.get(
 				`users/${query}/${mode}?key=${
@@ -93,72 +94,7 @@ class Affinity {
 				}`
 			);
 
-			return {
-				id: data.id,
-				username: data.username,
-				avatar: data.avatarUrl,
-				coverUrl: data.coverUrl,
-				joinDate: new Date(data.joinDate),
-				playstyle: data.playstyle,
-
-				kudosu: data.kudosu,
-
-				profile: {
-					occupation: data.occupation,
-					website: data.website,
-					discord: data.discord,
-					followers: data.followerCount,
-					previousNames: data.previousUsernames,
-				},
-
-				country: data.country,
-
-				information: {
-					active: data.isActive,
-					bot: data.isBot,
-					online: data.isOnline,
-					supporter: data.isSupporter,
-					hasSupported: data.hasSupported,
-				},
-
-				statistics: {
-					level: data.statistics.level.current,
-					globalRank: data.statistics.globalRank,
-					pp: data.statistics.pp,
-					rankedScore: data.statistics.rankedScore,
-					hitAccuracy: data.statistics.hitAccuracy,
-					playCount: data.statistics.playCount,
-					playTime: data.statistics.playTime,
-					totalScore: data.statistics.totalScore,
-					totalHits: data.statistics.totalHits,
-					maximumCombo: data.statistics.maximumCombo,
-					rankCounts: data.statistics.gradeCounts,
-					countryRank: data.statistics.countryRank,
-				},
-
-				badges: data.badges?.map(({ awardedAt, ...data }) => {
-					return {
-						...data,
-						awardedAt: new Date(awardedAt),
-					};
-				}),
-
-				playcounts: data.monthlyPlaycounts.map((p) => {
-					return {
-						startDate: p.start_date,
-						count: p.count,
-					};
-				}),
-
-				achievements: data.userAchievements.map((a) => {
-					return {
-						id: a.achievement_id,
-						achievedAt: new Date(a.achieved_at),
-					};
-				}),
-
-				rankHistory: data.rankHistory,
-			};
+			return new User(data);
 		} else {
 			throw new Error(
 				'You must be logged in to fetch data about a user!'

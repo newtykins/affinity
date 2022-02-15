@@ -6,6 +6,10 @@
 		"forceConsistentCasingInFileNames": true,
 		"strict": false,
 		"skipLibCheck": true,
-		"typeRoots": ["./types", "./node_modules/@types"]
+		"baseUrl": "./src",
+		"paths": {
+			"~structures/*": ["./structures/*"]
+		},
+		"plugins": [{ "transform": "ts-transform-paths" }]
 	}
 }
