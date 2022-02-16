@@ -24,6 +24,7 @@ const camelCase = (object: Object) => {
 };
 
 // todo: comments
+// todo: add more filters
 class Affinity {
 	#clientId: number;
 	#clientSecret: string;
@@ -126,6 +127,7 @@ class Affinity {
 
 	/**
 	 * Fetch data about a user's scores by looking them up using their ID!
+	 * @async
 	 */
 	async getUserScores(
 		id: number,

@@ -27,13 +27,13 @@ const config = {
 					routeBasePath: '/',
 					// Please change this to your repo.
 					editUrl:
-						'https://github.com/facebook/docusaurus/tree/main/docs',
+						'https://github.com/newtykins/affinity/tree/main/docs',
 				},
 				blog: {
 					showReadingTime: true,
 					// Please change this to your repo.
 					editUrl:
-						'https://github.com/facebook/docusaurus/tree/main/docs',
+						'https://github.com/newtykins/affinity/tree/main/docs',
 				},
 				theme: {
 					customCss: require.resolve('./src/css/custom.css'),
