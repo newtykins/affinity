@@ -1,7 +1,9 @@
 import Affinity from '~affinity';
+import User from '~structures/User';
 
 describe('The Affinity Client', () => {
 	let client: Affinity;
+	let newtUser: User;
 
 	beforeAll(async () => {
 		client = new Affinity(
@@ -10,6 +12,8 @@ describe('The Affinity Client', () => {
 		);
 
 		await client.login();
+
+		newtUser = await client.getUser(16009610);
 	});
 
 	//* Login tests
@@ -34,6 +38,18 @@ describe('The Affinity Client', () => {
 	//* User tests
 	it('finds the correct ID for the username "Newt x3"', async () => {
 		const data = await client.getUser('Newt x3');
-		expect(data.id).toBe(16009610);
+		expect(data.id).toBe(newtUser.id);
+	});
+
+	it("can find a user's best scores using the method on the client", async () => {
+		const [score] = await client.getUserScores(newtUser.id);
+
+		expect(score.userId).toBe(newtUser.id);
+	});
+
+	it("can find a user's recent scores using the method on a user class", async () => {
+		const [score] = await newtUser.getScores();
+
+		expect(score.userId).toBe(newtUser.id);
 	});
 });

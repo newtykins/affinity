@@ -10,7 +10,8 @@
 		"paths": {
 			"~structures/*": ["./structures/*"],
 			"~helpers/*": ["./helpers/*"],
-			"~affinity": ["./index.ts"]
+			"~affinity": ["./index.ts"],
+			"~constants": ["./constants.ts"]
 		},
 		"plugins": [{ "transform": "ts-transform-paths" }]
 	}

@@ -1,98 +1,142 @@
 import axios, { Axios } from 'axios';
 import _ from 'lodash';
 import User from '~structures/User';
-import { Modes } from './constants';
+import Score from '~structures/Score';
+import { Modes, ScoreSearchTypes } from '~constants';
+
+interface AuthResponse {
+	token: string;
+	expires: number;
+}
+
+const camelCase = (object: Object) => {
+	let newObject = {};
+
+	for (const key in object) {
+		if (typeof object[key] === 'object' && !Array.isArray(object[key])) {
+			newObject[_.camelCase(key)] = camelCase(object[key]);
+		} else {
+			newObject[_.camelCase(key)] = object[key];
+		}
+	}
+
+	return newObject;
+};
 
 // todo: comments
 class Affinity {
-	private clientId: number;
-	private clientSecret: string;
+	#clientId: number;
+	#clientSecret: string;
 	private loggedIn: boolean = false;
 	private rest: Axios;
-	static Modes = Modes;
 
 	constructor(clientId: number, clientSecret: string) {
 		if (!clientId)
 			throw new Error('You must provide an ID for the client!');
 		if (!clientSecret) throw new Error('You must provide a client secret!');
 
-		this.clientId = clientId;
-		this.clientSecret = clientSecret;
+		// Store the client credentials
+		this.#clientId = clientId;
+		this.#clientSecret = clientSecret;
+
+		// Create the REST client
+		this.rest = axios.create({
+			baseURL: 'https://osu.ppy.sh/api/v2/',
+		});
+
+		this.rest.interceptors.response.use((response) => {
+			if (
+				typeof response.data === 'object' &&
+				!Array.isArray(response.data)
+			) {
+				response.data = camelCase(response.data);
+			} else {
+				response.data = response.data.map((v) => camelCase(v));
+			}
+
+			return response;
+		});
+	}
+
+	/**
+	 * Authenticate the client
+	 * @private
+	 * @async
+	 */
+	private async authenticate(): Promise<AuthResponse> {
+		// Fetch the user's access token
+		const {
+			data: { access_token, expires_in },
+		} = await axios.post(`https://osu.ppy.sh/oauth/token`, {
+			client_id: this.#clientId,
+			client_secret: this.#clientSecret,
+			grant_type: 'client_credentials',
+			scope: 'public',
+		});
+
+		return { token: access_token, expires: expires_in };
+	}
+
+	/**
+	 * Ensure that the client is logged in before authenticating a request!
+	 * @private
+	 */
+	private loggedInCheck(): boolean {
+		if (this.loggedIn) return true;
+		else {
+			throw new Error('You must be logged in to make use of Affinity!');
+		}
 	}
 
 	/**
 	 * Log into the API!
+	 * @async
 	 */
 	public async login(): Promise<boolean> {
 		if (!this.loggedIn) {
-			// Fetch the user's access token
-			const {
-				data: { access_token },
-			} = await axios.post(`https://osu.ppy.sh/oauth/token`, {
-				client_id: this.clientId,
-				client_secret: this.clientSecret,
-				grant_type: 'client_credentials',
-				scope: 'public',
-			});
+			const { token, expires } = await this.authenticate();
 
-			if (access_token) {
-				// Create a new axios REST client
-				this.rest = axios.create({
-					baseURL: 'https://osu.ppy.sh/api/v2/',
-					headers: {
-						Authorization: `Bearer ${access_token}`,
-					},
-				});
+			// Update the axios instance's headers
+			this.rest.defaults.headers['Authorization'] = `Bearer ${token}`;
 
-				// Ensure that all properties are camel case
-				const camelCase = (object: Object) => {
-					let newObject = {};
-
-					for (const key in object) {
-						if (
-							typeof object[key] === 'object' &&
-							!Array.isArray(object[key])
-						) {
-							newObject[_.camelCase(key)] = camelCase(
-								object[key]
-							);
-						} else {
-							newObject[_.camelCase(key)] = object[key];
-						}
-					}
-
-					return newObject;
-				};
-
-				this.rest.interceptors.response.use((response) => {
-					response.data = camelCase(response.data);
-
-					return response;
-				});
-
-				this.loggedIn = true;
-			}
+			this.loggedIn = true;
 		}
 
 		return this.loggedIn;
 	}
 
+	/**
+	 * Fetch data about a user!
+	 * @async
+	 */
 	async getUser(
 		query: string | number,
-		mode: Modes = Affinity.Modes.Standard
+		mode: Modes = Modes.Standard
 	): Promise<User> {
-		if (this.loggedIn) {
+		if (this.loggedInCheck()) {
 			const { data } = await this.rest.get(
 				`users/${query}/${mode}?key=${
 					typeof query === 'number' ? 'id' : 'username'
 				}`
 			);
 
-			return new User(data);
-		} else {
-			throw new Error(
-				'You must be logged in to fetch data about a user!'
+			return new User(this, data);
+		}
+	}
+
+	/**
+	 * Fetch data about a user's scores by looking them up using their ID!
+	 */
+	async getUserScores(
+		id: number,
+		type: ScoreSearchTypes = ScoreSearchTypes.Best
+	): Promise<Score[]> {
+		if (this.loggedInCheck()) {
+			const { data }: { data: any[] } = await this.rest.get(
+				`users/${id}/scores/${type}`
 			);
+
+			return data.map((score) => new Score(this, score));
 		}
 	}
 }

@@ -7,6 +7,12 @@ enum Modes {
 	Taiko = 'taiko',
 }
 
+enum ScoreSearchTypes {
+	Best = 'best',
+	First = 'first',
+	Recent = 'recent',
+}
+
 export const modNumCodes = {
 	NF: 1,
 	EZ: 2,
@@ -56,4 +62,4 @@ export const modsOrder: Mods.Order = {
 	TD: 7,
 };
 
-export { Modes };
+export { Modes, ScoreSearchTypes };

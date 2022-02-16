@@ -1,5 +1,10 @@
+import Affinity from '~affinity';
+import { ScoreSearchTypes } from '~constants';
+
 class User {
-	public rawData: any; // todo: potentially type?
+	public rawData: any;
+	#client: Affinity;
+
 	public id: number;
 	public username: string;
 	public avatar: string;
@@ -21,9 +26,10 @@ class User {
 	public supporter: boolean;
 	public hasSupported: boolean;
 
-	constructor(data: any) {
+	constructor(client: Affinity, data: any) {
 		// Provide the raw data
 		this.rawData = data;
+		this.#client = client;
 
 		// Parse the data
 		this.id = data.id;
@@ -85,6 +91,14 @@ class User {
 		});
 
 		this.rankHistory = data.rankHistory;
+	}
+
+	/**
+	 * Fetch scores associated with this user!
+	 * @async
+	 */
+	public async getScores(type: ScoreSearchTypes = ScoreSearchTypes.Best) {
+		return await this.#client.getUserScores(this.id, type);
 	}
 }
 
