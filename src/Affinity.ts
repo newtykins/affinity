@@ -80,7 +80,7 @@ class Affinity {
 			scope: 'public',
 		});
 
-		return { token: access_token, expires: expires_in };
+		return { token: access_token, expires: expires_in * 1000 };
 	}
 
 	/**
@@ -101,12 +101,18 @@ class Affinity {
 	 * @async
 	 */
 	public async login(): Promise<boolean> {
-		if (!this.loggedIn) {
+		const refresh = async () => {
 			const { token, expires } = await this.authenticate();
 
 			// Update the axios instance's headers
 			this.rest.defaults.headers['Authorization'] = `Bearer ${token}`;
 
+			// Refresh the token on expiry
+			setTimeout(async () => await refresh(), expires);
+		};
+
+		if (!this.loggedIn) {
+			await refresh();
 			this.loggedIn = true;
 		}
 

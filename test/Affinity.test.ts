@@ -44,7 +44,6 @@ describe('The Affinity Client', () => {
 	//* User tests
 	it('finds the correct ID for the username "Newt x3"', async () => {
 		const data = await client.getUser(newtUser.username);
-		console.log(newtUser.username, data.id, client.loggedIn);
 		expect(data.id).toBe(newtUser.id);
 	});
 
