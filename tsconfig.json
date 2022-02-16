@@ -12,7 +12,8 @@
 			"~structures/*": ["./structures/*"],
 			"~helpers/*": ["./helpers/*"],
 			"~affinity": ["./index.ts"],
-			"~constants": ["./constants.ts"]
+			"~constants": ["./constants.ts"],
+			"~errors/*": ["./errors/*"]
 		},
 		"plugins": [{ "transform": "ts-transform-paths" }]
 	}

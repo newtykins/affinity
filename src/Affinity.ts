@@ -3,6 +3,8 @@ import _ from 'lodash';
 import User from '~structures/User';
 import Score from '~structures/Score';
 import { Modes, ScoreSearchTypes } from '~constants';
+import AuthenticationError from '~errors/AuthenticationError';
+import BadRequestError from '~errors/BadRequestError';
 
 interface AuthResponse {
 	token: string;
@@ -28,13 +30,16 @@ const camelCase = (object: Object) => {
 class Affinity {
 	#clientId: number;
 	#clientSecret: string;
-	private loggedIn: boolean = false;
+	public loggedIn: boolean = false;
 	private rest: Axios;
 
 	constructor(clientId: number, clientSecret: string) {
 		if (!clientId)
-			throw new Error('You must provide an ID for the client!');
-		if (!clientSecret) throw new Error('You must provide a client secret!');
+			throw new AuthenticationError(
+				'You must provide an ID for the client!'
+			);
+		if (!clientSecret)
+			throw new AuthenticationError('You must provide a client secret!');
 
 		// Store the client credentials
 		this.#clientId = clientId;
@@ -85,7 +90,9 @@ class Affinity {
 	private loggedInCheck(): boolean {
 		if (this.loggedIn) return true;
 		else {
-			throw new Error('You must be logged in to make use of Affinity!');
+			throw new AuthenticationError(
+				'You must be logged in to make use of Affinity!'
+			);
 		}
 	}
 
@@ -134,6 +141,11 @@ class Affinity {
 		type: ScoreSearchTypes = ScoreSearchTypes.Best
 	): Promise<Score[]> {
 		if (this.loggedInCheck()) {
+			if (typeof id === 'string')
+				throw new BadRequestError(
+					'You can only search for scores using an ID!'
+				);
+
 			const { data }: { data: any[] } = await this.rest.get(
 				`users/${id}/scores/${type}`
 			);
