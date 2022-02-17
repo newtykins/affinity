@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"target": "es2016",
+		"target": "es2020",
 		"module": "commonjs",
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
@@ -11,11 +11,13 @@
 		"paths": {
 			"~structures/*": ["./structures/*"],
 			"~helpers/*": ["./helpers/*"],
-			"~affinity": ["./index.ts"],
-			"~constants": ["./constants.ts"],
+			"~affinity": ["./index"],
+			"~constants": ["./constants"],
 			"~errors/*": ["./errors/*"],
-			"~defaults": ["./defaultOptions.ts"]
+			"~defaults": ["./defaultOptions"]
 		},
-		"plugins": [{ "transform": "ts-transform-paths" }]
-	}
+		"plugins": [{ "transform": "ts-transform-paths" }],
+		"declaration": true
+	},
+	"include": ["src/**/*.ts"]
 }
