@@ -10,7 +10,6 @@
 		"**/pnpm-lock.yaml": true,
 		"**/.czrc": true,
 		"**/node_modules": true,
-		"**/dist": true,
 		"**/.husky": true
 	},
 	"files.associations": {

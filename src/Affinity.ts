@@ -1,8 +1,8 @@
 import axios, { Axios } from 'axios';
 import _ from 'lodash';
 import User from '~structures/User';
-import Score from '~structures/Score';
-import { GameMode, ScoreSearchTypes } from '~constants';
+import Score, { ScoreSearchTypes } from '~structures/Score';
+import { GameMode } from '~constants';
 import AuthenticationError from '~errors/AuthenticationError';
 import BadRequestError from '~errors/BadRequestError';
 import defaultOptions from '~defaults';

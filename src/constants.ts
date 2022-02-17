@@ -7,12 +7,6 @@ enum GameMode {
 	Taiko = 'taiko',
 }
 
-enum ScoreSearchTypes {
-	Best = 'best',
-	First = 'first',
-	Recent = 'recent',
-}
-
 enum RankStatus {
 	graveyard = -2,
 	wip = -1,
@@ -72,4 +66,4 @@ export const modsOrder: Mods.Order = {
 	TD: 7,
 };
 
-export { GameMode, ScoreSearchTypes, RankStatus };
+export { GameMode, RankStatus };

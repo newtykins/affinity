@@ -91,4 +91,11 @@ namespace Score {
 	}
 }
 
+enum ScoreSearchTypes {
+	Best = 'best',
+	First = 'first',
+	Recent = 'recent',
+}
+
 export default Score;
+export { ScoreSearchTypes };

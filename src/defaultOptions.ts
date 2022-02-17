@@ -1,5 +1,6 @@
 import Affinity from '~affinity';
-import { GameMode, ScoreSearchTypes } from '~constants';
+import { GameMode } from '~constants';
+import { ScoreSearchTypes } from '~structures/Score';
 
 const userScores: Affinity.Options.UserScores = {
 	type: ScoreSearchTypes.Best,

@@ -1,10 +1,10 @@
 import { modNumCodes, modsOrder } from '../constants';
 
 class Mods {
-	static numCodes: Mods.NumCodes = modNumCodes;
-	static order: Mods.Order = modsOrder;
+	public numCodes: Mods.NumCodes = modNumCodes;
+	public order: Mods.Order = modsOrder;
 
-	public static parseCode(mods: number): string {
+	public parseCode(mods: number): string {
 		const enabled: {
 			name: string;
 			order: number;
@@ -33,7 +33,7 @@ class Mods {
 		return output.length !== 0 ? output.join('') : 'NM';
 	}
 
-	public static parseString(str: string): number {
+	public parseString(str: string): number {
 		// Break up the string into two character pairs
 		const mods = [...str.match(/.{1,2}/g)];
 		if (!mods) return undefined;

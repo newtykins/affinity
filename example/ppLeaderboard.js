@@ -1,4 +1,4 @@
-const Affinity = require('../dist/index').default;
+const { default: Affinity, GameMode } = require('../dist');
 
 const ppLeaderboard = async (ids) => {
 	// Setting up the Affinity client
@@ -11,7 +11,7 @@ const ppLeaderboard = async (ids) => {
 
 	// Fetch user data
 	let users = await Promise.all(
-		ids.map(async (id) => await client.getUser(id))
+		ids.map(async (id) => await client.getUser(id, GameMode.Standard)) // standard is default, but we are declaring it here just to demonstrate the usage of enums
 	);
 
 	// Sort the users by their PP values
