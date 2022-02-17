@@ -47,6 +47,7 @@ describe('The Affinity Client', () => {
 		expect(data.id).toBe(newtUser.id);
 	});
 
+	//* User Score tests
 	it("can find a user's best scores", async () => {
 		const [score] = await client.getUserScores(newtUser.id);
 		expect(score.userId).toBe(newtUser.id);
@@ -59,5 +60,12 @@ describe('The Affinity Client', () => {
 		} catch (e) {
 			expect(e).toBeInstanceOf(BadRequestError);
 		}
+	});
+
+	//* Beatmap tests
+	it(`can find the difficulty of the beatmap with the ID 2486881`, async () => {
+		const beatmap = await client.getBeatmap(2486881);
+
+		expect(beatmap.difficultyName).toBe('Harmony');
 	});
 });

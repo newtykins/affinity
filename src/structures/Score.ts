@@ -1,4 +1,4 @@
-import { Modes } from '~constants';
+import { GameMode } from '~constants';
 import Affinity from '~affinity';
 import User from './User';
 
@@ -18,7 +18,7 @@ class Score {
 	public rank: string;
 	public createdAt: Date;
 	public pp: number;
-	public mode: Modes;
+	public mode: GameMode;
 	public replay: boolean;
 
 	// todo: public beatmap: Beatmap;
@@ -26,13 +26,11 @@ class Score {
 	// todo: public user: UserCompact;
 
 	constructor(client: Affinity, data: any) {
-		// Provide the raw data
 		this.rawData = data;
 		this.#client = client;
 
 		const { statistics } = data;
 
-		// Parse the data
 		this.id = data.id;
 		this.userId = data.userId;
 		this.accuracy = data.accuracy;
@@ -57,11 +55,15 @@ class Score {
 		this.replay = data.replay;
 	}
 
+	public get url() {
+		return `https://osu.ppy.sh/scores/${this.mode}/${this.id}`;
+	}
+
 	/**
 	 * Fetch the user associated with this score!
 	 * @async
 	 */
-	public async fetchUser(mode: Modes = Modes.Standard): Promise<User> {
+	public async fetchUser(mode: GameMode = GameMode.Standard): Promise<User> {
 		return this.userId ? this.#client.getUser(this.userId, mode) : null;
 	}
 }

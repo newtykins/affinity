@@ -1,9 +1,9 @@
 import Affinity from '~affinity';
-import { Modes, ScoreSearchTypes } from '~constants';
+import { GameMode, ScoreSearchTypes } from '~constants';
 
 const userScores: Affinity.Options.UserScores = {
 	type: ScoreSearchTypes.Best,
-	mode: Modes.Standard,
+	mode: GameMode.Standard,
 };
 
 export default {

@@ -2,10 +2,11 @@ import axios, { Axios } from 'axios';
 import _ from 'lodash';
 import User from '~structures/User';
 import Score from '~structures/Score';
-import { Modes, ScoreSearchTypes } from '~constants';
+import { GameMode, ScoreSearchTypes } from '~constants';
 import AuthenticationError from '~errors/AuthenticationError';
 import BadRequestError from '~errors/BadRequestError';
 import defaultOptions from '~defaults';
+import Beatmap from '~structures/Beatmap';
 
 interface AuthResponse {
 	token: string;
@@ -31,8 +32,8 @@ const camelCase = (object: Object) => {
 class Affinity {
 	#clientId: number;
 	#clientSecret: string;
+	#rest: Axios;
 	public loggedIn: boolean = false;
-	private rest: Axios;
 
 	constructor(clientId: number, clientSecret: string) {
 		if (!clientId)
@@ -47,11 +48,11 @@ class Affinity {
 		this.#clientSecret = clientSecret;
 
 		// Create the REST client
-		this.rest = axios.create({
+		this.#rest = axios.create({
 			baseURL: 'https://osu.ppy.sh/api/v2/',
 		});
 
-		this.rest.interceptors.response.use((response) => {
+		this.#rest.interceptors.response.use((response) => {
 			if (
 				typeof response.data === 'object' &&
 				!Array.isArray(response.data)
@@ -106,7 +107,7 @@ class Affinity {
 			const { token, expires } = await this.authenticate();
 
 			// Update the axios instance's headers
-			this.rest.defaults.headers['Authorization'] = `Bearer ${token}`;
+			this.#rest.defaults.headers['Authorization'] = `Bearer ${token}`;
 
 			// Refresh the token on expiry
 			setTimeout(async () => await refresh(), expires);
@@ -124,14 +125,14 @@ class Affinity {
 	 * Fetch data about a user!
 	 * @async
 	 */
-	async getUser(
+	public async getUser(
 		query: string | number,
-		mode: Modes = Modes.Standard
+		mode: GameMode = GameMode.Standard
 	): Promise<User> {
 		const key = typeof query === 'number' ? 'id' : 'username';
 
 		if (this.loggedInCheck()) {
-			const { data } = await this.rest.get(`users/${query}/${mode}`, {
+			const { data } = await this.#rest.get(`users/${query}/${mode}`, {
 				params: {
 					key,
 				},
@@ -145,7 +146,7 @@ class Affinity {
 	 * Fetch data about a user's scores by looking them up using their ID!
 	 * @async
 	 */
-	async getUserScores(
+	public async getUserScores(
 		id: number,
 		options: Affinity.Options.UserScores = defaultOptions.userScores
 	): Promise<Score[]> {
@@ -158,7 +159,7 @@ class Affinity {
 
 			// Make the request
 			const { type, mode, includeFails, limit, offset } = options;
-			const { data }: { data: any[] } = await this.rest.get(
+			const { data }: { data: any[] } = await this.#rest.get(
 				`users/${id}/scores/${type}`,
 				{
 					params: {
@@ -174,13 +175,32 @@ class Affinity {
 			return data.map((score) => new Score(this, score));
 		}
 	}
+
+	/**
+	 * Fetch data about a beatmap by its ID!
+	 * @async
+	 */
+	public async getBeatmap(id: number) {
+		if (this.loggedInCheck()) {
+			// Ensure that the ID provided is a number
+			if (isNaN(id))
+				throw new BadRequestError(
+					'You can only fetch a beatmap by its ID!'
+				);
+
+			// Make the request
+			const { data } = await this.#rest.get(`beatmaps/${id}`);
+
+			return new Beatmap(this, data);
+		}
+	}
 }
 
 namespace Affinity {
 	export namespace Options {
 		export interface UserScores {
 			type: ScoreSearchTypes;
-			mode: Modes;
+			mode: GameMode;
 			includeFails?: boolean;
 			limit?: number;
 			offset?: number;

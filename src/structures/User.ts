@@ -1,5 +1,4 @@
 import Affinity from '~affinity';
-import { ScoreSearchTypes } from '~constants';
 import defaultOptions from '~defaults';
 
 class User {
@@ -20,6 +19,7 @@ class User {
 	public playcounts: User.Playcount[];
 	public achievements: User.Achievement[];
 	public rankHistory: User.RankHistory;
+	public previousUsernames: string[];
 
 	public active: boolean;
 	public bot: boolean;
@@ -28,11 +28,9 @@ class User {
 	public hasSupported: boolean;
 
 	constructor(client: Affinity, data: any) {
-		// Provide the raw data
 		this.rawData = data;
 		this.#client = client;
 
-		// Parse the data
 		this.id = data.id;
 		this.username = data.username;
 		this.avatar = data.avatarUrl;
@@ -92,6 +90,11 @@ class User {
 		});
 
 		this.rankHistory = data.rankHistory;
+		this.previousUsernames = data.previousUsernames;
+	}
+
+	public get url() {
+		return `https://osu.ppy.sh/u/${this.id}`;
 	}
 
 	/**
