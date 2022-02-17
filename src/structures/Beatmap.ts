@@ -1,12 +1,12 @@
 import Affinity from '~affinity';
 import { GameMode, RankStatus } from '~constants';
+import BeatmapSet from './BeatmapSet';
 import User from './User';
 
 class Beatmap {
 	public rawData: any;
 	#client: Affinity;
 
-	// BeatmapCompact
 	public id: number;
 	public beatmapsetId: number;
 	public mode: GameMode;
@@ -15,16 +15,12 @@ class Beatmap {
 	public length: number;
 	public difficultyName: string;
 	public maxCombo: number;
-
-	// Beatmap
 	public difficultyStats: Beatmap.Difficulty;
 	public bpm: number;
 	public convert: boolean;
 	public objectCounts: Beatmap.ObjectCounts;
 	public passCount: number;
 	public playCount: number;
-
-	// Beatmapset
 
 	/**
 	 * The mapper's name at the time of submission - potentially outdated.
@@ -35,34 +31,34 @@ class Beatmap {
 		this.rawData = data;
 		this.#client = client;
 
-		this.id = data.id;
-		this.beatmapsetId = data.beatmapsetId;
-		this.mode = data.mode;
-		this.status = data.status;
-		this.starRating = data.difficultyRating;
-		this.length = data.totalLength;
-		this.difficultyName = data.version;
-		this.maxCombo = data.maxCombo;
+		this.id = data?.id;
+		this.beatmapsetId = data?.beatmapsetId;
+		this.mode = data?.mode;
+		this.status = data?.status;
+		this.starRating = data?.difficultyRating;
+		this.length = data?.totalLength;
+		this.difficultyName = data?.version;
+		this.maxCombo = data?.maxCombo;
 
 		this.difficultyStats = {
-			cs: data.cs,
-			ar: data.ar,
-			od: data.acurracy,
-			hp: data.drain,
+			cs: data?.cs,
+			ar: data?.ar,
+			od: data?.acurracy,
+			hp: data?.drain,
 		};
 
-		this.bpm = data.bpm;
-		this.convert = data.convert;
+		this.bpm = data?.bpm;
+		this.convert = data?.convert;
 
 		this.objectCounts = {
-			circles: data.countCircles,
-			sliders: data.countSliders,
-			spinners: data.countSpinners,
+			circles: data?.countCircles,
+			sliders: data?.countSliders,
+			spinners: data?.countSpinners,
 		};
 
-		this.passCount = data.passCount;
-		this.playCount = data.playCount;
-		this.mapper = data.beatmapset.creator;
+		this.passCount = data?.passCount;
+		this.playCount = data?.playCount;
+		this.mapper = data?.beatmapset?.creator;
 	}
 
 	public get url() {
@@ -77,7 +73,13 @@ class Beatmap {
 		return await this.#client.getUser(this.mapper, mode);
 	}
 
-	// todo: fetchBeatmapset
+	/**
+	 * Fetch the beatmap set this beatmap belongs to!
+	 * @async
+	 */
+	public async fetchBeatmapSet(): Promise<BeatmapSet> {
+		return await this.#client.getBeatmapSet(this.beatmapsetId);
+	}
 }
 
 namespace Beatmap {

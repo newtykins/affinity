@@ -18,6 +18,11 @@ describe('The Beatmap structure', () => {
 
 	it('fetches the profile of the mapper when fetchMapper is called', async () => {
 		const mapper = await sunglow.fetchMapper();
-		expect(mapper.previousUsernames.includes('Onlybiscuit')).toBe(true);
+		expect(mapper.id).toBe(7785535);
+	});
+
+	it('can fetch the beatmap set that the beatmap belongs to', async () => {
+		const beatmapset = await sunglow.fetchBeatmapSet();
+		expect(beatmapset.id).toBe(1193588);
 	});
 });

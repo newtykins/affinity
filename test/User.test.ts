@@ -17,7 +17,7 @@ describe('The User structure', () => {
 	});
 
 	it("can find a user's recent scores", async () => {
-		const [score] = await newtUser.getScores();
+		const [score] = await newtUser.fetchScores();
 		expect(score.userId).toBe(newtUser.id);
 	});
 });

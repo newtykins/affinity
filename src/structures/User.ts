@@ -31,66 +31,68 @@ class User {
 		this.rawData = data;
 		this.#client = client;
 
-		this.id = data.id;
-		this.username = data.username;
-		this.avatar = data.avatarUrl;
-		this.coverUrl = data.coverUrl;
-		this.joinDate = new Date(data.joinDate);
-		this.playstyle = data.playstyle;
-		this.kudosu = data.kudosu;
-		this.country = data.country;
-		this.active = data.isActive;
-		this.bot = data.isBot;
-		this.online = data.isOnline;
-		this.supporter = data.isSupporter;
-		this.hasSupported = data.hasSupported;
+		const { statistics } = data;
+
+		this.id = data?.id;
+		this.username = data?.username;
+		this.avatar = data?.avatarUrl;
+		this.coverUrl = data?.coverUrl;
+		this.joinDate = new Date(data?.joinDate);
+		this.playstyle = data?.playstyle;
+		this.kudosu = data?.kudosu;
+		this.country = data?.country;
+		this.active = data?.isActive;
+		this.bot = data?.isBot;
+		this.online = data?.isOnline;
+		this.supporter = data?.isSupporter;
+		this.hasSupported = data?.hasSupported;
 
 		this.profile = {
-			occupation: data.occupation,
-			website: data.website,
-			discord: data.discord,
-			followers: data.followerCount,
-			previousNames: data.previousUsernames,
+			occupation: data?.occupation,
+			website: data?.website,
+			discord: data?.discord,
+			followers: data?.followerCount,
+			previousNames: data?.previousUsernames,
 		};
 
 		this.statistics = {
-			level: data.statistics.level.current,
-			globalRank: data.statistics.globalRank,
-			pp: data.statistics.pp,
-			rankedScore: data.statistics.rankedScore,
-			hitAccuracy: data.statistics.hitAccuracy,
-			playCount: data.statistics.playCount,
-			playTime: data.statistics.playTime,
-			totalScore: data.statistics.totalScore,
-			totalHits: data.statistics.totalHits,
-			maximumCombo: data.statistics.maximumCombo,
-			rankCounts: data.statistics.gradeCounts,
-			countryRank: data.statistics.countryRank,
+			level: statistics?.level?.current,
+			globalRank: statistics?.globalRank,
+			pp: statistics?.pp,
+			rankedScore: statistics?.rankedScore,
+			hitAccuracy: statistics?.hitAccuracy,
+			playCount: statistics?.playCount,
+			playTime: statistics?.playTime,
+			totalScore: statistics?.totalScore,
+			totalHits: statistics?.totalHits,
+			maximumCombo: statistics?.maximumCombo,
+			rankCounts: statistics?.gradeCounts,
+			countryRank: statistics?.countryRank,
 		};
 
-		this.badges = data.badges?.map(({ awardedAt, ...data }) => {
+		this.badges = data?.badges?.map(({ awardedAt, ...data }) => {
 			return {
 				...data,
 				awardedAt: new Date(awardedAt),
 			};
 		});
 
-		this.playcounts = data.monthlyPlaycounts.map((p) => {
+		this.playcounts = data?.monthlyPlaycounts.map((p) => {
 			return {
 				startDate: p.start_date,
 				count: p.count,
 			};
 		});
 
-		this.achievements = data.userAchievements.map((a) => {
+		this.achievements = data?.userAchievements.map((a) => {
 			return {
 				id: a.achievement_id,
 				achievedAt: new Date(a.achieved_at),
 			};
 		});
 
-		this.rankHistory = data.rankHistory;
-		this.previousUsernames = data.previousUsernames;
+		this.rankHistory = data?.rankHistory;
+		this.previousUsernames = data?.previousUsernames;
 	}
 
 	public get url() {
@@ -101,7 +103,7 @@ class User {
 	 * Fetch scores associated with this user!
 	 * @async
 	 */
-	public async getScores(
+	public async fetchScores(
 		options: Affinity.Options.UserScores = defaultOptions.userScores
 	) {
 		return await this.#client.getUserScores(this.id, options);
