@@ -65,7 +65,21 @@ describe('The Affinity Client', () => {
 	//* Beatmap tests
 	it(`can find the difficulty of the beatmap with the id 2486881`, async () => {
 		const beatmap = await client.getBeatmap(2486881);
-
 		expect(beatmap.difficultyName).toBe('Harmony');
+	});
+
+	//* Beatmap set tests
+	it('can list the difficulties on the beatmap with the id 2486881', async () => {
+		const beatmapset = await client.getBeatmapSet(1193588);
+		const difficulties = beatmapset.beatmaps.map(
+			(beatmap) => beatmap.difficultyName
+		);
+
+		expect(difficulties).toEqual(expect.arrayContaining(['Harmony']));
+	});
+
+	it('can search for beatmap sets', async () => {
+		const beatmapsets = await client.searchBeatmapSets('Sunglow');
+		expect(beatmapsets.length).toBeGreaterThan(0);
 	});
 });

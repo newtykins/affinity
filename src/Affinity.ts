@@ -2,7 +2,7 @@ import axios, { Axios } from 'axios';
 import _ from 'lodash';
 import User from '~structures/User';
 import Score, { ScoreSearchTypes } from '~structures/Score';
-import { GameMode } from '~constants';
+import { GameMode, Genre, Language, RankStatus } from '~constants';
 import AuthenticationError from '~errors/AuthenticationError';
 import BadRequestError from '~errors/BadRequestError';
 import defaultOptions from '~defaults';
@@ -223,6 +223,37 @@ class Affinity {
 			return new BeatmapSet(this, data);
 		}
 	}
+
+	public async searchBeatmapSets(
+		query: string,
+		options: Affinity.Options.SearchBeatmapSets = {}
+	): Promise<BeatmapSet[]> {
+		const { mode, rankedStatus, genre, language, include, nsfw } = options;
+
+		if (this.loggedInCheck()) {
+			// Make the request
+			const {
+				data: { beatmapsets },
+			}: { data: { beatmapsets: any[] } } = await this.#rest.get(
+				'beatmapsets/search',
+				{
+					params: {
+						q: query,
+						m: mode,
+						s: rankedStatus,
+						g: genre,
+						l: language,
+						e: include,
+						nsfw,
+					},
+				}
+			);
+
+			return beatmapsets.map(
+				(beatmapset) => new BeatmapSet(this, beatmapset)
+			);
+		}
+	}
 }
 
 namespace Affinity {
@@ -233,6 +264,15 @@ namespace Affinity {
 			includeFails?: boolean;
 			limit?: number;
 			offset?: number;
+		}
+
+		export interface SearchBeatmapSets {
+			mode?: GameMode;
+			rankedStatus?: Exclude<keyof typeof RankStatus, 'wip' | 'approved'>;
+			genre?: Genre;
+			language?: Language;
+			include?: 'video' | 'storyboard';
+			nsfw?: boolean;
 		}
 	}
 }

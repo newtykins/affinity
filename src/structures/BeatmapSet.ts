@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Affinity from '~affinity';
-import { GameMode, RankStatus } from '~constants';
+import { GameMode, Genre, RankStatus } from '~constants';
 import Beatmap from './Beatmap';
 
 class BeatmapSet {
@@ -22,7 +22,8 @@ class BeatmapSet {
 	public rankedDate: Date;
 	public submittedDate: Date;
 	public tags: string[];
-	public difficulties: Map<string, BeatmapSet.Difficulty>;
+	public beatmaps: Beatmap[];
+	public genre: Genre;
 
 	/**
 	 * The mapper's name at the time of the set's submission - potentially outdated.
@@ -39,7 +40,7 @@ class BeatmapSet {
 		this.artistUnicode = data?.artistUnicode;
 		this.title = data?.title;
 		this.titleUnicode = data?.titleUnicode;
-		this.mapper = data?.mapper;
+		this.mapper = data?.creator;
 		this.mapperId = data?.userId;
 		this.nsfw = data?.nsfw;
 		this.playCount = data?.playCount;
@@ -50,20 +51,21 @@ class BeatmapSet {
 		this.rankedDate = data?.rankedDate ? new Date(data?.rankedDate) : null;
 		this.submittedDate = new Date(data?.submittedDate);
 		this.tags = data?.tags?.split(' ');
+		this.genre = data?.genre?.name;
 
-		this.difficulties = new Map<string, BeatmapSet.Difficulty>();
+		this.beatmaps = data?.beatmaps?.map(
+			({ playcount, passcount, ...beatmap }) => {
+				const b = new Beatmap(this.#client, {
+					playCount: playcount,
+					passCount: passcount,
+					...beatmap,
+				});
 
-		data.beatmaps.forEach((beatmap) => {
-			this.difficulties.set(beatmap.version, {
-				starRating: beatmap?.difficultyRating,
-				cs: beatmap?.cs,
-				ar: beatmap?.ar,
-				od: beatmap?.accuracy,
-				hp: beatmap?.drain,
-				fetchBeatmap: async () =>
-					await this.#client.getBeatmap(beatmap?.id),
-			});
-		});
+				b.mapper = this.mapper;
+
+				return b;
+			}
+		);
 
 		// @ts-ignore
 		this.covers = {};
@@ -93,11 +95,6 @@ namespace BeatmapSet {
 		list2x: string;
 		slimCover: string;
 		slimCover2x: string;
-	}
-
-	export interface Difficulty extends Beatmap.Difficulty {
-		starRating: number;
-		fetchBeatmap(): Promise<Beatmap>;
 	}
 }
 

@@ -7,7 +7,6 @@ class Beatmap {
 	public rawData: any;
 	#client: Affinity;
 
-	// BeatmapCompact
 	public id: number;
 	public beatmapsetId: number;
 	public mode: GameMode;
@@ -16,16 +15,12 @@ class Beatmap {
 	public length: number;
 	public difficultyName: string;
 	public maxCombo: number;
-
-	// Beatmap
 	public difficultyStats: Beatmap.Difficulty;
 	public bpm: number;
 	public convert: boolean;
 	public objectCounts: Beatmap.ObjectCounts;
 	public passCount: number;
 	public playCount: number;
-
-	// Beatmapset
 
 	/**
 	 * The mapper's name at the time of submission - potentially outdated.

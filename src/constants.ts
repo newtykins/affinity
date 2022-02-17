@@ -17,6 +17,38 @@ enum RankStatus {
 	loved = 4,
 }
 
+enum Genre {
+	Unspecified = 'unspecified',
+	VideoGame = 'bideo game',
+	Anime = 'anime',
+	Rock = 'rock',
+	Pop = 'pop',
+	Other = 'other',
+	Novelty = 'novelty',
+	HipHop = 'hip hop',
+	Electronic = 'electronic',
+	Metal = 'metal',
+	Classical = 'classical',
+	Folk = 'folk',
+	Jazz = 'jazz',
+}
+
+enum Language {
+	English = 'english',
+	Chinese = 'chinese',
+	French = 'french',
+	German = 'german',
+	Italian = 'italian',
+	Japanese = 'japanese',
+	Korean = 'korean',
+	Spanish = 'spanish',
+	Swedish = 'swedish',
+	Russian = 'russian',
+	Polish = 'polish',
+	Instrumental = 'instrumental',
+	Unspecified = 'unspecified',
+}
+
 export const modNumCodes = {
 	NF: 1,
 	EZ: 2,
@@ -66,4 +98,4 @@ export const modsOrder: Mods.Order = {
 	TD: 7,
 };
 
-export { GameMode, RankStatus };
+export { GameMode, RankStatus, Genre, Language };

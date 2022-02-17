@@ -16,11 +16,7 @@ describe('The Beatmap Set structure', () => {
 	});
 
 	it('can fetch difficulities living on the beatmap set', async () => {
-		const difficulty = [
-			...sinkIntoTheDeepSeaWorld.difficulties.values(),
-		][0];
-		const beatmap = await difficulty.fetchBeatmap();
-
+		const [beatmap] = sinkIntoTheDeepSeaWorld.beatmaps;
 		expect(beatmap.beatmapsetId).toBe(sinkIntoTheDeepSeaWorld.id);
 	});
 
