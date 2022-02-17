@@ -11,8 +11,6 @@ describe('The Beatmap structure', () => {
 			process.env.CLIENT_SECRET
 		);
 
-		await client.login();
-
 		sunglow = await client.getBeatmap(2486881);
 	});
 

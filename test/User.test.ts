@@ -11,8 +11,6 @@ describe('The User structure', () => {
 			process.env.CLIENT_SECRET
 		);
 
-		await client.login();
-
 		newtUser = await client.getUser(16009610);
 	});
 

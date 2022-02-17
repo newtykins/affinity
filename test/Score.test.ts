@@ -13,8 +13,6 @@ describe('The Score structure', () => {
 			process.env.CLIENT_SECRET
 		);
 
-		await client.login();
-
 		toy = await client.getUser(2757689);
 
 		const [score] = await toy.fetchScores();

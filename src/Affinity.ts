@@ -43,7 +43,7 @@ class Affinity {
 	#clientId: number;
 	#clientSecret: string;
 	#rest: Axios;
-	public loggedIn: boolean = false;
+	#authenticated: boolean = false;
 
 	constructor(clientId: number, clientSecret: string) {
 		if (!clientId)
@@ -77,6 +77,13 @@ class Affinity {
 	}
 
 	/**
+	 * Is the client currently logged in?
+	 */
+	public get loggedIn() {
+		return this.#authenticated;
+	}
+
+	/**
 	 * Authenticate the client
 	 * @private
 	 * @async
@@ -99,36 +106,23 @@ class Affinity {
 	 * Ensure that the client is logged in before authenticating a request!
 	 * @private
 	 */
-	private loggedInCheck(): boolean {
-		if (this.loggedIn) return true;
-		else {
-			throw new AuthenticationError(
-				'You must be logged in to make use of Affinity!'
-			);
-		}
-	}
-
-	/**
-	 * Log into the API!
-	 * @async
-	 */
-	public async login(): Promise<boolean> {
-		const refresh = async () => {
+	private async isLoggedIn(): Promise<boolean> {
+		// If the client is not logged in, make sure to log in
+		if (!this.#authenticated) {
 			const { token, expires } = await this.authenticate();
 
 			// Update the axios instance's headers
 			this.#rest.defaults.headers['Authorization'] = `Bearer ${token}`;
 
-			// Refresh the token on expiry
-			setTimeout(async () => await refresh(), expires);
-		};
+			// Mark the client as logged out
+			setTimeout(() => {
+				this.#authenticated = false;
+			}, expires);
 
-		if (!this.loggedIn) {
-			await refresh();
-			this.loggedIn = true;
+			this.#authenticated = true;
 		}
 
-		return this.loggedIn;
+		return this.#authenticated;
 	}
 
 	/**
@@ -141,7 +135,7 @@ class Affinity {
 	): Promise<User> {
 		const key = typeof query === 'number' ? 'id' : 'username';
 
-		if (this.loggedInCheck()) {
+		if (await this.isLoggedIn()) {
 			const { data } = await this.#rest.get(`users/${query}/${mode}`, {
 				params: {
 					key,
@@ -160,8 +154,8 @@ class Affinity {
 		id: number,
 		options: Affinity.Options.UserScores = defaultOptions.userScores
 	): Promise<Score[]> {
-		if (this.loggedInCheck()) {
-			// Ensure that the id provided is a number
+		if (await this.isLoggedIn()) {
+			// Ensure that the ID provided is a number
 			if (isNaN(id))
 				throw new BadRequestError(
 					'You can only search for scores using an id!'
@@ -191,8 +185,8 @@ class Affinity {
 	 * @async
 	 */
 	public async getBeatmap(id: number) {
-		if (this.loggedInCheck()) {
-			// Ensure that the id provided is a number
+		if (await this.isLoggedIn()) {
+			// Ensure that the ID provided is a number
 			if (isNaN(id))
 				throw new BadRequestError(
 					'You can only fetch a beatmap by its id!'
@@ -210,8 +204,8 @@ class Affinity {
 	 * @async
 	 */
 	public async getBeatmapSet(id: number): Promise<BeatmapSet> {
-		if (this.loggedInCheck()) {
-			// Ensure that the id provided is a number
+		if (await this.isLoggedIn()) {
+			// Ensure that the ID provided is a number
 			if (isNaN(id))
 				throw new BadRequestError(
 					'You can only fetch a beatmapset by its id!'
@@ -230,7 +224,7 @@ class Affinity {
 	): Promise<BeatmapSet[]> {
 		const { mode, rankedStatus, genre, language, include, nsfw } = options;
 
-		if (this.loggedInCheck()) {
+		if (await this.isLoggedIn()) {
 			// Make the request
 			const {
 				data: { beatmapsets },

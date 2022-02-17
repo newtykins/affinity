@@ -12,8 +12,6 @@ describe('The Affinity Client', () => {
 
 	beforeAll(async () => {
 		client = new Affinity(clientId, clientSecret);
-		await client.login();
-
 		newtUser = await client.getUser(16009610);
 	});
 
@@ -22,20 +20,6 @@ describe('The Affinity Client', () => {
 		try {
 			// @ts-ignore
 			const differentClient = new Affinity();
-		} catch (e) {
-			expect(e).toBeInstanceOf(AuthenticationError);
-		}
-	});
-
-	it('can log into the API using client credentials', async () => {
-		const differentClient = new Affinity(clientId, clientSecret);
-		expect(await differentClient.login()).toBe(true);
-	});
-
-	it('can not use a method when not logged in', async () => {
-		try {
-			const differentClient = new Affinity(clientId, clientSecret);
-			const user = await differentClient.getUser(newtUser.id);
 		} catch (e) {
 			expect(e).toBeInstanceOf(AuthenticationError);
 		}
