@@ -1,6 +1,6 @@
 import Affinity from '~affinity';
 import { GameMode, RankStatus } from '~constants';
-import User from '~structures/User';
+import User from './User';
 
 class Beatmap {
 	public rawData: any;
@@ -69,6 +69,10 @@ class Beatmap {
 		return `https://osu.ppy.sh/b/${this.id}`;
 	}
 
+	/**
+	 * Fetch the mapper of the beatmap!
+	 * @async
+	 */
 	public async fetchMapper(mode = this.mode): Promise<User> {
 		return await this.#client.getUser(this.mapper, mode);
 	}

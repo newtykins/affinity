@@ -18,6 +18,5 @@
 		},
 		"plugins": [{ "transform": "ts-transform-paths" }],
 		"declaration": true
-	},
-	"include": ["src/**/*.ts"]
+	}
 }

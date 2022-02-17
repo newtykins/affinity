@@ -1,6 +1,7 @@
 import { GameMode } from '~constants';
 import Affinity from '~affinity';
 import User from './User';
+import Beatmap from './Beatmap';
 
 class Score {
 	public rawData: any;
@@ -20,10 +21,8 @@ class Score {
 	public pp: number;
 	public mode: GameMode;
 	public replay: boolean;
-
-	// todo: public beatmap: Beatmap;
-	// todo: public beatmapSet: BeatmapSet;
-	// todo: public user: UserCompact;
+	public beatmapId: number;
+	public beatmapsetId: number;
 
 	constructor(client: Affinity, data: any) {
 		this.rawData = data;
@@ -53,6 +52,8 @@ class Score {
 		(this.createdAt = new Date(data.createdAt)), (this.pp = data.pp);
 		this.mode = data.mode;
 		this.replay = data.replay;
+		this.beatmapId = data.beatmap.id;
+		this.beatmapsetId = data.beatmapset.id;
 	}
 
 	public get url() {
@@ -66,6 +67,15 @@ class Score {
 	public async fetchUser(mode: GameMode = GameMode.Standard): Promise<User> {
 		return this.userId ? this.#client.getUser(this.userId, mode) : null;
 	}
+
+	/**
+	 * Fetch the beatmap this score was set on!
+	 */
+	public async fetchBeatmap(): Promise<Beatmap> {
+		return this.#client.getBeatmap(this.beatmapId);
+	}
+
+	// todo: fetchBeatmapset
 }
 
 namespace Score {

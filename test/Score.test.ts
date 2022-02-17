@@ -1,9 +1,11 @@
 import Affinity from '~affinity';
+import Score from '~structures/Score';
 import User from '~structures/User';
 
 describe('The Score structure', () => {
 	let client: Affinity;
-	let newtUser: User;
+	let toy: User;
+	let sidetrackedDay: Score;
 
 	beforeAll(async () => {
 		client = new Affinity(
@@ -13,13 +15,19 @@ describe('The Score structure', () => {
 
 		await client.login();
 
-		newtUser = await client.getUser(16009610);
+		toy = await client.getUser(2757689);
+
+		const [score] = await toy.getScores();
+		sidetrackedDay = score;
 	});
 
 	it('can find the user associated with a set of scores', async () => {
-		const [score] = await client.getUserScores(newtUser.id);
-		const user = await score.fetchUser();
+		const user = await sidetrackedDay.fetchUser();
+		expect(user.id).toBe(toy.id);
+	});
 
-		expect(user.id).toBe(newtUser.id);
+	it('can find the beatmap the score was set on', async () => {
+		const beatmap = await sidetrackedDay.fetchBeatmap();
+		expect(beatmap.id).toBe(1754777);
 	});
 });
