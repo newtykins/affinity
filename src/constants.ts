@@ -1,16 +1,20 @@
 import Mods from '~helpers/Mods';
 
-enum Modes {
+enum GameMode {
 	CTB = 'fruits',
 	Mania = 'mania',
 	Standard = 'osu',
 	Taiko = 'taiko',
 }
 
-enum ScoreSearchTypes {
-	Best = 'best',
-	First = 'first',
-	Recent = 'recent',
+enum RankStatus {
+	graveyard = -2,
+	wip = -1,
+	pending = 0,
+	ranked = 1,
+	approved = 2,
+	qualified = 3,
+	loved = 4,
 }
 
 export const modNumCodes = {
@@ -62,4 +66,4 @@ export const modsOrder: Mods.Order = {
 	TD: 7,
 };
 
-export { Modes, ScoreSearchTypes };
+export { GameMode, RankStatus };

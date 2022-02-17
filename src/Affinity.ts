@@ -1,8 +1,12 @@
 import axios, { Axios } from 'axios';
 import _ from 'lodash';
 import User from '~structures/User';
-import Score from '~structures/Score';
-import { Modes, ScoreSearchTypes } from '~constants';
+import Score, { ScoreSearchTypes } from '~structures/Score';
+import { GameMode } from '~constants';
+import AuthenticationError from '~errors/AuthenticationError';
+import BadRequestError from '~errors/BadRequestError';
+import defaultOptions from '~defaults';
+import Beatmap from '~structures/Beatmap';
 
 interface AuthResponse {
 	token: string;
@@ -28,24 +32,27 @@ const camelCase = (object: Object) => {
 class Affinity {
 	#clientId: number;
 	#clientSecret: string;
-	private loggedIn: boolean = false;
-	private rest: Axios;
+	#rest: Axios;
+	public loggedIn: boolean = false;
 
 	constructor(clientId: number, clientSecret: string) {
 		if (!clientId)
-			throw new Error('You must provide an ID for the client!');
-		if (!clientSecret) throw new Error('You must provide a client secret!');
+			throw new AuthenticationError(
+				'You must provide an ID for the client!'
+			);
+		if (!clientSecret)
+			throw new AuthenticationError('You must provide a client secret!');
 
 		// Store the client credentials
 		this.#clientId = clientId;
 		this.#clientSecret = clientSecret;
 
 		// Create the REST client
-		this.rest = axios.create({
+		this.#rest = axios.create({
 			baseURL: 'https://osu.ppy.sh/api/v2/',
 		});
 
-		this.rest.interceptors.response.use((response) => {
+		this.#rest.interceptors.response.use((response) => {
 			if (
 				typeof response.data === 'object' &&
 				!Array.isArray(response.data)
@@ -75,7 +82,7 @@ class Affinity {
 			scope: 'public',
 		});
 
-		return { token: access_token, expires: expires_in };
+		return { token: access_token, expires: expires_in * 1000 };
 	}
 
 	/**
@@ -85,7 +92,9 @@ class Affinity {
 	private loggedInCheck(): boolean {
 		if (this.loggedIn) return true;
 		else {
-			throw new Error('You must be logged in to make use of Affinity!');
+			throw new AuthenticationError(
+				'You must be logged in to make use of Affinity!'
+			);
 		}
 	}
 
@@ -94,12 +103,18 @@ class Affinity {
 	 * @async
 	 */
 	public async login(): Promise<boolean> {
-		if (!this.loggedIn) {
+		const refresh = async () => {
 			const { token, expires } = await this.authenticate();
 
 			// Update the axios instance's headers
-			this.rest.defaults.headers['Authorization'] = `Bearer ${token}`;
+			this.#rest.defaults.headers['Authorization'] = `Bearer ${token}`;
 
+			// Refresh the token on expiry
+			setTimeout(async () => await refresh(), expires);
+		};
+
+		if (!this.loggedIn) {
+			await refresh();
 			this.loggedIn = true;
 		}
 
@@ -110,16 +125,18 @@ class Affinity {
 	 * Fetch data about a user!
 	 * @async
 	 */
-	async getUser(
+	public async getUser(
 		query: string | number,
-		mode: Modes = Modes.Standard
+		mode: GameMode = GameMode.Standard
 	): Promise<User> {
+		const key = typeof query === 'number' ? 'id' : 'username';
+
 		if (this.loggedInCheck()) {
-			const { data } = await this.rest.get(
-				`users/${query}/${mode}?key=${
-					typeof query === 'number' ? 'id' : 'username'
-				}`
-			);
+			const { data } = await this.#rest.get(`users/${query}/${mode}`, {
+				params: {
+					key,
+				},
+			});
 
 			return new User(this, data);
 		}
@@ -129,16 +146,64 @@ class Affinity {
 	 * Fetch data about a user's scores by looking them up using their ID!
 	 * @async
 	 */
-	async getUserScores(
+	public async getUserScores(
 		id: number,
-		type: ScoreSearchTypes = ScoreSearchTypes.Best
+		options: Affinity.Options.UserScores = defaultOptions.userScores
 	): Promise<Score[]> {
 		if (this.loggedInCheck()) {
-			const { data }: { data: any[] } = await this.rest.get(
-				`users/${id}/scores/${type}`
+			// Ensure that the ID provided is a number
+			if (isNaN(id))
+				throw new BadRequestError(
+					'You can only search for scores using an ID!'
+				);
+
+			// Make the request
+			const { type, mode, includeFails, limit, offset } = options;
+			const { data }: { data: any[] } = await this.#rest.get(
+				`users/${id}/scores/${type}`,
+				{
+					params: {
+						include_fails: includeFails ? 1 : 0,
+						mode,
+						limit,
+						offset,
+					},
+				}
 			);
 
+			// Turn the data from the API into Affinity-wrapped scores
 			return data.map((score) => new Score(this, score));
+		}
+	}
+
+	/**
+	 * Fetch data about a beatmap by its ID!
+	 * @async
+	 */
+	public async getBeatmap(id: number) {
+		if (this.loggedInCheck()) {
+			// Ensure that the ID provided is a number
+			if (isNaN(id))
+				throw new BadRequestError(
+					'You can only fetch a beatmap by its ID!'
+				);
+
+			// Make the request
+			const { data } = await this.#rest.get(`beatmaps/${id}`);
+
+			return new Beatmap(this, data);
+		}
+	}
+}
+
+namespace Affinity {
+	export namespace Options {
+		export interface UserScores {
+			type: ScoreSearchTypes;
+			mode: GameMode;
+			includeFails?: boolean;
+			limit?: number;
+			offset?: number;
 		}
 	}
 }
