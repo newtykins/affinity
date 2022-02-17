@@ -42,7 +42,7 @@ describe('The Affinity Client', () => {
 	});
 
 	//* User tests
-	it('finds the correct ID for the username "Newt x3"', async () => {
+	it('finds the correct id for the username "Newt x3"', async () => {
 		const data = await client.getUser(newtUser.username);
 		expect(data.id).toBe(newtUser.id);
 	});
@@ -63,7 +63,7 @@ describe('The Affinity Client', () => {
 	});
 
 	//* Beatmap tests
-	it(`can find the difficulty of the beatmap with the ID 2486881`, async () => {
+	it(`can find the difficulty of the beatmap with the id 2486881`, async () => {
 		const beatmap = await client.getBeatmap(2486881);
 
 		expect(beatmap.difficultyName).toBe('Harmony');

@@ -30,30 +30,31 @@ class Score {
 
 		const { statistics } = data;
 
-		this.id = data.id;
-		this.userId = data.userId;
-		this.accuracy = data.accuracy;
-		this.mods = data.mods;
-		this.score = data.score;
-		this.maximumCombo = data.maxCombo;
-		this.passed = data.passed;
-		this.perfect = data.perfect;
+		this.id = data?.id;
+		this.userId = data?.userId;
+		this.accuracy = data?.accuracy;
+		this.mods = data?.mods;
+		this.score = data?.score;
+		this.maximumCombo = data?.maxCombo;
+		this.passed = data?.passed;
+		this.perfect = data?.perfect;
 
 		this.hits = {
-			50: statistics['count50'],
-			100: statistics['count100'],
-			300: statistics['count300'],
-			geki: statistics.countGeki,
-			katu: statistics.countKatu,
-			miss: statistics.countMiss,
+			50: statistics?.['count50'],
+			100: statistics?.['count100'],
+			300: statistics?.['count300'],
+			geki: statistics?.countGeki,
+			katu: statistics?.countKatu,
+			miss: statistics?.countMiss,
 		};
 
-		this.rank = data.rank;
-		(this.createdAt = new Date(data.createdAt)), (this.pp = data.pp);
-		this.mode = data.mode;
-		this.replay = data.replay;
-		this.beatmapId = data.beatmap.id;
-		this.beatmapsetId = data.beatmapset.id;
+		this.rank = data?.rank;
+		this.createdAt = new Date(data?.createdAt);
+		this.pp = data?.pp;
+		this.mode = data?.mode;
+		this.replay = data?.replay;
+		this.beatmapId = data?.beatmap?.id;
+		this.beatmapsetId = data?.beatmapset?.id;
 	}
 
 	public get url() {
@@ -65,14 +66,14 @@ class Score {
 	 * @async
 	 */
 	public async fetchUser(mode: GameMode = GameMode.Standard): Promise<User> {
-		return this.userId ? this.#client.getUser(this.userId, mode) : null;
+		return await this.#client.getUser(this.userId, mode);
 	}
 
 	/**
 	 * Fetch the beatmap this score was set on!
 	 */
 	public async fetchBeatmap(): Promise<Beatmap> {
-		return this.#client.getBeatmap(this.beatmapId);
+		return await this.#client.getBeatmap(this.beatmapId);
 	}
 
 	// todo: fetchBeatmapset

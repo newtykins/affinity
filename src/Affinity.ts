@@ -7,20 +7,30 @@ import AuthenticationError from '~errors/AuthenticationError';
 import BadRequestError from '~errors/BadRequestError';
 import defaultOptions from '~defaults';
 import Beatmap from '~structures/Beatmap';
+import BeatmapSet from '~structures/BeatmapSet';
 
 interface AuthResponse {
 	token: string;
 	expires: number;
 }
 
-const camelCase = (object: Object) => {
+const camelCase = (object: object | object[]) => {
 	let newObject = {};
 
 	for (const key in object) {
+		const newKey = _.camelCase(key);
+
 		if (typeof object[key] === 'object' && !Array.isArray(object[key])) {
-			newObject[_.camelCase(key)] = camelCase(object[key]);
+			newObject[newKey] = camelCase(object[key]);
+		} else if (Array.isArray(object[key])) {
+			newObject[newKey] = [];
+
+			object[key].forEach((value) => {
+				if (typeof value === 'object') value = camelCase(value);
+				newObject[newKey].push(value);
+			});
 		} else {
-			newObject[_.camelCase(key)] = object[key];
+			newObject[newKey] = object[key];
 		}
 	}
 
@@ -38,7 +48,7 @@ class Affinity {
 	constructor(clientId: number, clientSecret: string) {
 		if (!clientId)
 			throw new AuthenticationError(
-				'You must provide an ID for the client!'
+				'You must provide an id for the client!'
 			);
 		if (!clientSecret)
 			throw new AuthenticationError('You must provide a client secret!');
@@ -143,7 +153,7 @@ class Affinity {
 	}
 
 	/**
-	 * Fetch data about a user's scores by looking them up using their ID!
+	 * Fetch data about a user's scores by looking them up using their id!
 	 * @async
 	 */
 	public async getUserScores(
@@ -151,10 +161,10 @@ class Affinity {
 		options: Affinity.Options.UserScores = defaultOptions.userScores
 	): Promise<Score[]> {
 		if (this.loggedInCheck()) {
-			// Ensure that the ID provided is a number
+			// Ensure that the id provided is a number
 			if (isNaN(id))
 				throw new BadRequestError(
-					'You can only search for scores using an ID!'
+					'You can only search for scores using an id!'
 				);
 
 			// Make the request
@@ -177,21 +187,40 @@ class Affinity {
 	}
 
 	/**
-	 * Fetch data about a beatmap by its ID!
+	 * Fetch data about a beatmap by its id!
 	 * @async
 	 */
 	public async getBeatmap(id: number) {
 		if (this.loggedInCheck()) {
-			// Ensure that the ID provided is a number
+			// Ensure that the id provided is a number
 			if (isNaN(id))
 				throw new BadRequestError(
-					'You can only fetch a beatmap by its ID!'
+					'You can only fetch a beatmap by its id!'
 				);
 
 			// Make the request
 			const { data } = await this.#rest.get(`beatmaps/${id}`);
 
 			return new Beatmap(this, data);
+		}
+	}
+
+	/**
+	 * Fetch data about a beatmap set by its id!
+	 * @async
+	 */
+	public async getBeatmapSet(id: number): Promise<BeatmapSet> {
+		if (this.loggedInCheck()) {
+			// Ensure that the id provided is a number
+			if (isNaN(id))
+				throw new BadRequestError(
+					'You can only fetch a beatmapset by its id!'
+				);
+
+			// Make the request
+			const { data } = await this.#rest.get(`beatmapsets/${id}`);
+
+			return new BeatmapSet(this, data);
 		}
 	}
 }

@@ -35,34 +35,34 @@ class Beatmap {
 		this.rawData = data;
 		this.#client = client;
 
-		this.id = data.id;
-		this.beatmapsetId = data.beatmapsetId;
-		this.mode = data.mode;
-		this.status = data.status;
-		this.starRating = data.difficultyRating;
-		this.length = data.totalLength;
-		this.difficultyName = data.version;
-		this.maxCombo = data.maxCombo;
+		this.id = data?.id;
+		this.beatmapsetId = data?.beatmapsetId;
+		this.mode = data?.mode;
+		this.status = data?.status;
+		this.starRating = data?.difficultyRating;
+		this.length = data?.totalLength;
+		this.difficultyName = data?.version;
+		this.maxCombo = data?.maxCombo;
 
 		this.difficultyStats = {
-			cs: data.cs,
-			ar: data.ar,
-			od: data.acurracy,
-			hp: data.drain,
+			cs: data?.cs,
+			ar: data?.ar,
+			od: data?.acurracy,
+			hp: data?.drain,
 		};
 
-		this.bpm = data.bpm;
-		this.convert = data.convert;
+		this.bpm = data?.bpm;
+		this.convert = data?.convert;
 
 		this.objectCounts = {
-			circles: data.countCircles,
-			sliders: data.countSliders,
-			spinners: data.countSpinners,
+			circles: data?.countCircles,
+			sliders: data?.countSliders,
+			spinners: data?.countSpinners,
 		};
 
-		this.passCount = data.passCount;
-		this.playCount = data.playCount;
-		this.mapper = data.beatmapset.creator;
+		this.passCount = data?.passCount;
+		this.playCount = data?.playCount;
+		this.mapper = data?.beatmapset?.creator;
 	}
 
 	public get url() {
