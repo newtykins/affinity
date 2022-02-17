@@ -1,5 +1,6 @@
 import Affinity from '~affinity';
 import { ScoreSearchTypes } from '~constants';
+import defaultOptions from '~defaults';
 
 class User {
 	public rawData: any;
@@ -97,8 +98,10 @@ class User {
 	 * Fetch scores associated with this user!
 	 * @async
 	 */
-	public async getScores(type: ScoreSearchTypes = ScoreSearchTypes.Best) {
-		return await this.#client.getUserScores(this.id, type);
+	public async getScores(
+		options: Affinity.Options.UserScores = defaultOptions.userScores
+	) {
+		return await this.#client.getUserScores(this.id, options);
 	}
 }
 

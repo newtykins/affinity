@@ -4,7 +4,8 @@
 	"description": "",
 	"main": "dist/index.js",
 	"scripts": {
-		"test": "jest --setupFiles dotenv/config --watchAll --verbose",
+		"test": "jest --setupFiles dotenv/config --verbose",
+		"test:watch": "npm run test --watchAll",
 		"lint": "prettier src --write",
 		"commit": "cz"
 	},

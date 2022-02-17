@@ -5,6 +5,7 @@ import Score from '~structures/Score';
 import { Modes, ScoreSearchTypes } from '~constants';
 import AuthenticationError from '~errors/AuthenticationError';
 import BadRequestError from '~errors/BadRequestError';
+import defaultOptions from '~defaults';
 
 interface AuthResponse {
 	token: string;
@@ -127,12 +128,14 @@ class Affinity {
 		query: string | number,
 		mode: Modes = Modes.Standard
 	): Promise<User> {
+		const key = typeof query === 'number' ? 'id' : 'username';
+
 		if (this.loggedInCheck()) {
-			const { data } = await this.rest.get(
-				`users/${query}/${mode}?key=${
-					typeof query === 'number' ? 'id' : 'username'
-				}`
-			);
+			const { data } = await this.rest.get(`users/${query}/${mode}`, {
+				params: {
+					key,
+				},
+			});
 
 			return new User(this, data);
 		}
@@ -144,19 +147,43 @@ class Affinity {
 	 */
 	async getUserScores(
 		id: number,
-		type: ScoreSearchTypes = ScoreSearchTypes.Best
+		options: Affinity.Options.UserScores = defaultOptions.userScores
 	): Promise<Score[]> {
 		if (this.loggedInCheck()) {
-			if (typeof id === 'string')
+			// Ensure that the ID provided is a number
+			if (isNaN(id))
 				throw new BadRequestError(
 					'You can only search for scores using an ID!'
 				);
 
+			// Make the request
+			const { type, mode, includeFails, limit, offset } = options;
 			const { data }: { data: any[] } = await this.rest.get(
-				`users/${id}/scores/${type}`
+				`users/${id}/scores/${type}`,
+				{
+					params: {
+						include_fails: includeFails ? 1 : 0,
+						mode,
+						limit,
+						offset,
+					},
+				}
 			);
 
+			// Turn the data from the API into Affinity-wrapped scores
 			return data.map((score) => new Score(this, score));
+		}
+	}
+}
+
+namespace Affinity {
+	export namespace Options {
+		export interface UserScores {
+			type: ScoreSearchTypes;
+			mode: Modes;
+			includeFails?: boolean;
+			limit?: number;
+			offset?: number;
 		}
 	}
 }
