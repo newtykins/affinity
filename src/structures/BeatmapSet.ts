@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Affinity from '~affinity';
-import { RankStatus } from '~constants';
+import { GameMode, RankStatus } from '~constants';
 import Beatmap from './Beatmap';
 
 class BeatmapSet {
@@ -73,6 +73,14 @@ class BeatmapSet {
 				data?.covers[key];
 		});
 	}
+
+	/**
+	 * Fetch the mapper of the beatmap set!
+	 * @async
+	 */
+	public async fetchMapper(mode: GameMode = GameMode.Standard) {
+		return await this.#client.getUser(this.mapperId, mode);
+	}
 }
 
 namespace BeatmapSet {
@@ -89,7 +97,6 @@ namespace BeatmapSet {
 
 	export interface Difficulty extends Beatmap.Difficulty {
 		starRating: number;
-
 		fetchBeatmap(): Promise<Beatmap>;
 	}
 }

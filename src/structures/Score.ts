@@ -2,6 +2,7 @@ import { GameMode } from '~constants';
 import Affinity from '~affinity';
 import User from './User';
 import Beatmap from './Beatmap';
+import BeatmapSet from './BeatmapSet';
 
 class Score {
 	public rawData: any;
@@ -71,12 +72,19 @@ class Score {
 
 	/**
 	 * Fetch the beatmap this score was set on!
+	 * @async
 	 */
 	public async fetchBeatmap(): Promise<Beatmap> {
 		return await this.#client.getBeatmap(this.beatmapId);
 	}
 
-	// todo: fetchBeatmapset
+	/**
+	 * Fetch the beatmap set of the beatmap this score was set on!
+	 * @async
+	 */
+	public async fetchBeatmapSet(): Promise<BeatmapSet> {
+		return await this.#client.getBeatmapSet(this.beatmapsetId);
+	}
 }
 
 namespace Score {

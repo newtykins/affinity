@@ -1,5 +1,6 @@
 import Affinity from '~affinity';
 import { GameMode, RankStatus } from '~constants';
+import BeatmapSet from './BeatmapSet';
 import User from './User';
 
 class Beatmap {
@@ -77,7 +78,13 @@ class Beatmap {
 		return await this.#client.getUser(this.mapper, mode);
 	}
 
-	// todo: fetchBeatmapset
+	/**
+	 * Fetch the beatmap set this beatmap belongs to!
+	 * @async
+	 */
+	public async fetchBeatmapSet(): Promise<BeatmapSet> {
+		return await this.#client.getBeatmapSet(this.beatmapsetId);
+	}
 }
 
 namespace Beatmap {

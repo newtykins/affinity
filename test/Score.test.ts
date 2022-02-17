@@ -17,7 +17,7 @@ describe('The Score structure', () => {
 
 		toy = await client.getUser(2757689);
 
-		const [score] = await toy.getScores();
+		const [score] = await toy.fetchScores();
 		sidetrackedDay = score;
 	});
 
@@ -29,5 +29,10 @@ describe('The Score structure', () => {
 	it('can find the beatmap the score was set on', async () => {
 		const beatmap = await sidetrackedDay.fetchBeatmap();
 		expect(beatmap.id).toBe(1754777);
+	});
+
+	it('can find the beatmap set the score was set on', async () => {
+		const beatmapset = await sidetrackedDay.fetchBeatmapSet();
+		expect(beatmapset.id).toBe(838182);
 	});
 });

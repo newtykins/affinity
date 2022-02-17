@@ -13,7 +13,6 @@ describe('The Beatmap Set structure', () => {
 
 		await client.login();
 		sinkIntoTheDeepSeaWorld = await client.getBeatmapSet(779495);
-		console.log(sinkIntoTheDeepSeaWorld);
 	});
 
 	it('can fetch difficulities living on the beatmap set', async () => {
@@ -23,5 +22,10 @@ describe('The Beatmap Set structure', () => {
 		const beatmap = await difficulty.fetchBeatmap();
 
 		expect(beatmap.beatmapsetId).toBe(sinkIntoTheDeepSeaWorld.id);
+	});
+
+	it('can fetch the mapper of the beatmap set', async () => {
+		const mapper = await sinkIntoTheDeepSeaWorld.fetchMapper();
+		expect(mapper.id).toBe(7184125);
 	});
 });

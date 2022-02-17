@@ -103,7 +103,7 @@ class User {
 	 * Fetch scores associated with this user!
 	 * @async
 	 */
-	public async getScores(
+	public async fetchScores(
 		options: Affinity.Options.UserScores = defaultOptions.userScores
 	) {
 		return await this.#client.getUserScores(this.id, options);
