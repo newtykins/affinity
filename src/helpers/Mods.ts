@@ -41,7 +41,6 @@ class Mods {
 		// Calculate the final mod code value
 		return mods.reduce((a, b) => {
 			if (typeof a === 'string') a = modNumCodes[a];
-
 			return a + modNumCodes[b];
 		}, 0);
 	}

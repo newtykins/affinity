@@ -14,7 +14,8 @@
 			"~affinity": ["./index"],
 			"~constants": ["./constants"],
 			"~errors/*": ["./errors/*"],
-			"~defaults": ["./defaultOptions"]
+			"~defaults": ["./defaultOptions"],
+			"~functions/*": ["./functions/*"]
 		},
 		"plugins": [{ "transform": "ts-transform-paths" }],
 		"declaration": true

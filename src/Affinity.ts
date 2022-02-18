@@ -1,4 +1,4 @@
-import axios, { Axios } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import _ from 'lodash';
 import User from '~structures/User';
 import Score, { ScoreSearchTypes } from '~structures/Score';
@@ -8,42 +8,21 @@ import BadRequestError from '~errors/BadRequestError';
 import defaultOptions from '~defaults';
 import Beatmap from '~structures/Beatmap';
 import BeatmapSet from '~structures/BeatmapSet';
+import createAxios from '~functions/createAxios';
 
 interface AuthResponse {
 	token: string;
 	expires: number;
 }
 
-const camelCase = (object: object | object[]) => {
-	let newObject = {};
-
-	for (const key in object) {
-		const newKey = _.camelCase(key);
-
-		if (typeof object[key] === 'object' && !Array.isArray(object[key])) {
-			newObject[newKey] = camelCase(object[key]);
-		} else if (Array.isArray(object[key])) {
-			newObject[newKey] = [];
-
-			object[key].forEach((value) => {
-				if (typeof value === 'object') value = camelCase(value);
-				newObject[newKey].push(value);
-			});
-		} else {
-			newObject[newKey] = object[key];
-		}
-	}
-
-	return newObject;
-};
-
 // todo: comments
 // todo: add more filters
 class Affinity {
 	#clientId: number;
 	#clientSecret: string;
-	#rest: Axios;
+	#rest: AxiosInstance;
 	#authenticated: boolean = false;
+	#token: string;
 
 	constructor(clientId: number, clientSecret: string) {
 		if (!clientId)
@@ -58,22 +37,7 @@ class Affinity {
 		this.#clientSecret = clientSecret;
 
 		// Create the REST client
-		this.#rest = axios.create({
-			baseURL: 'https://osu.ppy.sh/api/v2/',
-		});
-
-		this.#rest.interceptors.response.use((response) => {
-			if (
-				typeof response.data === 'object' &&
-				!Array.isArray(response.data)
-			) {
-				response.data = camelCase(response.data);
-			} else {
-				response.data = response.data.map((v) => camelCase(v));
-			}
-
-			return response;
-		});
+		this.#rest = createAxios();
 	}
 
 	/**
@@ -84,7 +48,7 @@ class Affinity {
 	}
 
 	/**
-	 * Authenticate the client
+	 * Authenticate with the osu! API
 	 * @private
 	 * @async
 	 */
@@ -105,6 +69,7 @@ class Affinity {
 	/**
 	 * Ensure that the client is logged in before authenticating a request!
 	 * @private
+	 * @async
 	 */
 	private async isLoggedIn(): Promise<boolean> {
 		// If the client is not logged in, make sure to log in
@@ -113,6 +78,7 @@ class Affinity {
 
 			// Update the axios instance's headers
 			this.#rest.defaults.headers['Authorization'] = `Bearer ${token}`;
+			this.#token = token;
 
 			// Mark the client as logged out
 			setTimeout(() => {
@@ -142,7 +108,7 @@ class Affinity {
 				},
 			});
 
-			return new User(this, data);
+			return new User(this, this.#token, data);
 		}
 	}
 

@@ -49,6 +49,16 @@ enum Language {
 	Unspecified = 'unspecified',
 }
 
+enum UserBeatmapTypes {
+	Favourite = 'favourite',
+	Graveyard = 'graveyard',
+	Loved = 'loved',
+	MostPlayed = 'most_played',
+	Pending = 'pending',
+	Ranked = 'ranked',
+	Unranked = 'pending',
+}
+
 export const modNumCodes = {
 	NF: 1,
 	EZ: 2,
@@ -98,4 +108,4 @@ export const modsOrder: Mods.Order = {
 	TD: 7,
 };
 
-export { GameMode, RankStatus, Genre, Language };
+export { GameMode, RankStatus, Genre, Language, UserBeatmapTypes };

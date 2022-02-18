@@ -1,9 +1,17 @@
+import type { AxiosInstance } from 'axios';
+import createAxios from '~functions/createAxios';
 import Affinity from '~affinity';
+import { UserBeatmapTypes } from '~constants';
 import defaultOptions from '~defaults';
+import Beatmap from './Beatmap';
+import BeatmapCompact from './BeatmapCompact';
+import BeatmapSet from './BeatmapSet';
+import BeatmapPlaycount from './BeatmapPlaycount';
 
 class User {
 	public rawData: any;
 	#client: Affinity;
+	#rest: AxiosInstance;
 
 	public id: number;
 	public username: string;
@@ -27,9 +35,10 @@ class User {
 	public supporter: boolean;
 	public hasSupported: boolean;
 
-	constructor(client: Affinity, data: any) {
+	constructor(client: Affinity, token: string, data: any) {
 		this.rawData = data;
 		this.#client = client;
+		this.#rest = createAxios(token);
 
 		const { statistics } = data;
 
@@ -107,6 +116,38 @@ class User {
 		options: Affinity.Options.UserScores = defaultOptions.userScores
 	) {
 		return await this.#client.getUserScores(this.id, options);
+	}
+
+	/**
+	 * Fetch beatmaps relating to this user!
+	 * @async
+	 */
+	public async fetchBeatmaps<
+		T extends UserBeatmapTypes = UserBeatmapTypes.Favourite
+	>(
+		type?: T
+	): Promise<
+		T extends UserBeatmapTypes.MostPlayed
+			? BeatmapPlaycount[]
+			: BeatmapSet[]
+	> {
+		// @ts-expect-error - ensure there is a type
+		type = type ?? UserBeatmapTypes.Favourite;
+
+		// Make the request
+		const { data }: { data: any[] } = await this.#rest.get(
+			`users/${this.id}/beatmapsets/${type}`
+		);
+
+		if (type === UserBeatmapTypes.MostPlayed) {
+			// @ts-expect-error
+			return data.map(
+				(beatmap) => new BeatmapPlaycount(this.#client, beatmap)
+			);
+		} else {
+			// @ts-expect-error
+			return data.map((beatmap) => new BeatmapSet(this.#client, beatmap));
+		}
 	}
 }
 

@@ -67,8 +67,8 @@ class BeatmapSet {
 			}
 		);
 
-		// @ts-ignore
-		this.covers = {};
+		// @ts-expect-error - going to be populated momentarily
+		this.covers = Object.keys(data?.covers).length > 0 ? {} : null;
 
 		Object.keys(data?.covers).forEach((key) => {
 			this.covers[_.camelCase(key).replace('X', 'x').replace('@', '')] =

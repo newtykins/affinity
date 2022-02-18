@@ -1,19 +1,9 @@
 import Affinity from '~affinity';
-import { GameMode, RankStatus } from '~constants';
-import BeatmapSet from './BeatmapSet';
-import User from './User';
+import BeatmapCompact from './BeatmapCompact';
 
-class Beatmap {
+class Beatmap extends BeatmapCompact {
 	public rawData: any;
-	#client: Affinity;
 
-	public id: number;
-	public beatmapsetId: number;
-	public mode: GameMode;
-	public status: keyof typeof RankStatus;
-	public starRating: number;
-	public length: number;
-	public difficultyName: string;
 	public maxCombo: number;
 	public difficultyStats: Beatmap.Difficulty;
 	public bpm: number;
@@ -28,16 +18,9 @@ class Beatmap {
 	public mapper: string;
 
 	constructor(client: Affinity, data: any) {
+		super(client, data);
 		this.rawData = data;
-		this.#client = client;
 
-		this.id = data?.id;
-		this.beatmapsetId = data?.beatmapsetId;
-		this.mode = data?.mode;
-		this.status = data?.status;
-		this.starRating = data?.difficultyRating;
-		this.length = data?.totalLength;
-		this.difficultyName = data?.version;
 		this.maxCombo = data?.maxCombo;
 
 		this.difficultyStats = {
@@ -59,26 +42,6 @@ class Beatmap {
 		this.passCount = data?.passCount;
 		this.playCount = data?.playCount;
 		this.mapper = data?.beatmapset?.creator;
-	}
-
-	public get url() {
-		return `https://osu.ppy.sh/b/${this.id}`;
-	}
-
-	/**
-	 * Fetch the mapper of the beatmap!
-	 * @async
-	 */
-	public async fetchMapper(mode = this.mode): Promise<User> {
-		return await this.#client.getUser(this.mapper, mode);
-	}
-
-	/**
-	 * Fetch the beatmap set this beatmap belongs to!
-	 * @async
-	 */
-	public async fetchBeatmapSet(): Promise<BeatmapSet> {
-		return await this.#client.getBeatmapSet(this.beatmapsetId);
 	}
 }
 
