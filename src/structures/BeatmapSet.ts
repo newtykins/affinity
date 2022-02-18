@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import Affinity from '~affinity';
-import { GameMode, Genre, RankStatus } from '~constants';
 import Beatmap from './Beatmap';
 
 class BeatmapSet {
@@ -16,14 +15,14 @@ class BeatmapSet {
 	public nsfw: boolean;
 	public playCount: number;
 	public preview: string;
-	public status: keyof typeof RankStatus;
+	public status: BeatmapSet.RankStatus;
 	public bpm: number;
 	public lastUpdated: Date;
 	public rankedDate: Date;
 	public submittedDate: Date;
 	public tags: string[];
 	public beatmaps: Beatmap[];
-	public genre: Genre;
+	public genre: BeatmapSet.Genre;
 
 	/**
 	 * The mapper's name at the time of the set's submission - potentially outdated.
@@ -80,7 +79,7 @@ class BeatmapSet {
 	 * Fetch the mapper of the beatmap set!
 	 * @async
 	 */
-	public async fetchMapper(mode: GameMode = GameMode.Standard) {
+	public async fetchMapper(mode: Affinity.Modes = 'osu') {
 		return await this.#client.getUser(this.mapperId, mode);
 	}
 }
@@ -96,6 +95,45 @@ namespace BeatmapSet {
 		slimCover: string;
 		slimCover2x: string;
 	}
+
+	export type Genre =
+		| 'unspecified'
+		| 'video game'
+		| 'anime'
+		| 'rock'
+		| 'pop'
+		| 'other'
+		| 'novelty'
+		| 'hip hop'
+		| 'electronic'
+		| 'metal'
+		| 'classical'
+		| 'folk'
+		| 'jazz';
+
+	export type Language =
+		| 'english'
+		| 'chinese'
+		| 'french'
+		| 'german'
+		| 'italian'
+		| 'japanese'
+		| 'korean'
+		| 'spanish'
+		| 'swedish'
+		| 'russian'
+		| 'polish'
+		| 'instrumental'
+		| 'unspecified';
+
+	export type RankStatus =
+		| 'graveyard'
+		| 'wip'
+		| 'pending'
+		| 'ranked'
+		| 'approved'
+		| 'qualified'
+		| 'loved';
 }
 
 export default BeatmapSet;

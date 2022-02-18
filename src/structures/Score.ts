@@ -1,8 +1,8 @@
-import { GameMode } from '~constants';
 import Affinity from '~affinity';
 import User from './User';
 import Beatmap from './Beatmap';
 import BeatmapSet from './BeatmapSet';
+import parseMode from '~functions/parseMode';
 
 class Score {
 	public rawData: any;
@@ -20,16 +20,16 @@ class Score {
 	public rank: string;
 	public createdAt: Date;
 	public pp: number;
-	public mode: GameMode;
+	public mode: Affinity.Modes;
 	public replay: boolean;
 	public beatmapId: number;
 	public beatmapsetId: number;
 
 	constructor(client: Affinity, data: any) {
+		const { statistics } = data;
+
 		this.rawData = data;
 		this.#client = client;
-
-		const { statistics } = data;
 
 		this.id = data?.id;
 		this.userId = data?.userId;
@@ -39,6 +39,13 @@ class Score {
 		this.maximumCombo = data?.maxCombo;
 		this.passed = data?.passed;
 		this.perfect = data?.perfect;
+		this.rank = data?.rank;
+		this.createdAt = new Date(data?.createdAt);
+		this.pp = data?.pp;
+		this.mode = parseMode(data?.mode);
+		this.replay = data?.replay;
+		this.beatmapId = data?.beatmap?.id;
+		this.beatmapsetId = data?.beatmapset?.id;
 
 		this.hits = {
 			50: statistics?.['count50'],
@@ -48,14 +55,6 @@ class Score {
 			katu: statistics?.countKatu,
 			miss: statistics?.countMiss,
 		};
-
-		this.rank = data?.rank;
-		this.createdAt = new Date(data?.createdAt);
-		this.pp = data?.pp;
-		this.mode = data?.mode;
-		this.replay = data?.replay;
-		this.beatmapId = data?.beatmap?.id;
-		this.beatmapsetId = data?.beatmapset?.id;
 	}
 
 	public get url() {
@@ -66,7 +65,7 @@ class Score {
 	 * Fetch the user associated with this score!
 	 * @async
 	 */
-	public async fetchUser(mode: GameMode = GameMode.Standard): Promise<User> {
+	public async fetchUser(mode: Affinity.Modes = 'osu'): Promise<User> {
 		return await this.#client.getUser(this.userId, mode);
 	}
 

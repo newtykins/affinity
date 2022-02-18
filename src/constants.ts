@@ -1,53 +1,14 @@
 import Mods from '~helpers/Mods';
 
-enum GameMode {
-	CTB = 'fruits',
-	Mania = 'mania',
-	Standard = 'osu',
-	Taiko = 'taiko',
-}
-
-enum RankStatus {
-	graveyard = -2,
-	wip = -1,
-	pending = 0,
-	ranked = 1,
-	approved = 2,
-	qualified = 3,
-	loved = 4,
-}
-
-enum Genre {
-	Unspecified = 'unspecified',
-	VideoGame = 'bideo game',
-	Anime = 'anime',
-	Rock = 'rock',
-	Pop = 'pop',
-	Other = 'other',
-	Novelty = 'novelty',
-	HipHop = 'hip hop',
-	Electronic = 'electronic',
-	Metal = 'metal',
-	Classical = 'classical',
-	Folk = 'folk',
-	Jazz = 'jazz',
-}
-
-enum Language {
-	English = 'english',
-	Chinese = 'chinese',
-	French = 'french',
-	German = 'german',
-	Italian = 'italian',
-	Japanese = 'japanese',
-	Korean = 'korean',
-	Spanish = 'spanish',
-	Swedish = 'swedish',
-	Russian = 'russian',
-	Polish = 'polish',
-	Instrumental = 'instrumental',
-	Unspecified = 'unspecified',
-}
+// enum RankStatus {
+// 	graveyard = -2,
+// 	wip = -1,
+// 	pending = 0,
+// 	ranked = 1,
+// 	approved = 2,
+// 	qualified = 3,
+// 	loved = 4,
+// }
 
 enum UserBeatmapTypes {
 	Favourite = 'favourite',
@@ -108,4 +69,4 @@ export const modsOrder: Mods.Order = {
 	TD: 7,
 };
 
-export { GameMode, RankStatus, Genre, Language, UserBeatmapTypes };
+export { UserBeatmapTypes };

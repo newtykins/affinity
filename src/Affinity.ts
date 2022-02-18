@@ -2,7 +2,6 @@ import axios, { AxiosInstance } from 'axios';
 import _ from 'lodash';
 import User from '~structures/User';
 import Score, { ScoreSearchTypes } from '~structures/Score';
-import { GameMode, Genre, Language, RankStatus } from '~constants';
 import AuthenticationError from '~errors/AuthenticationError';
 import BadRequestError from '~errors/BadRequestError';
 import defaultOptions from '~defaults';
@@ -97,7 +96,7 @@ class Affinity {
 	 */
 	public async getUser(
 		query: string | number,
-		mode: GameMode = GameMode.Standard
+		mode: Affinity.Modes = 'osu'
 	): Promise<User> {
 		const key = typeof query === 'number' ? 'id' : 'username';
 
@@ -220,21 +219,23 @@ namespace Affinity {
 	export namespace Options {
 		export interface UserScores {
 			type: ScoreSearchTypes;
-			mode: GameMode;
+			mode: Modes;
 			includeFails?: boolean;
 			limit?: number;
 			offset?: number;
 		}
 
 		export interface SearchBeatmapSets {
-			mode?: GameMode;
-			rankedStatus?: Exclude<keyof typeof RankStatus, 'wip' | 'approved'>;
-			genre?: Genre;
-			language?: Language;
+			mode?: Modes;
+			rankedStatus?: Exclude<BeatmapSet.RankStatus, 'wip' | 'approved'>;
+			genre?: BeatmapSet.Genre;
+			language?: BeatmapSet.Language;
 			include?: 'video' | 'storyboard';
 			nsfw?: boolean;
 		}
 	}
+
+	export type Modes = 'osu' | 'ctb' | 'mania' | 'taiko';
 }
 
 export default Affinity;

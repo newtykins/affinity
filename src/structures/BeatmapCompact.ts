@@ -1,7 +1,7 @@
 import Affinity from '~affinity';
-import { GameMode, RankStatus } from '~constants';
 import BeatmapSet from './BeatmapSet';
 import User from './User';
+import parseMode from '~functions/parseMode';
 
 class BeatmapCompact {
 	#client: Affinity;
@@ -9,8 +9,8 @@ class BeatmapCompact {
 	public id: number;
 	public starRating: number;
 	public beatmapsetId: number;
-	public mode: GameMode;
-	public status: keyof typeof RankStatus;
+	public mode: Affinity.Modes;
+	public status: BeatmapSet.RankStatus;
 	public length: number;
 	public mapperId: number;
 	public difficultyName: string;
@@ -20,7 +20,7 @@ class BeatmapCompact {
 
 		this.id = data?.id;
 		this.beatmapsetId = data?.beatmapsetId;
-		this.mode = data?.mode;
+		this.mode = parseMode(data?.mode);
 		this.status = data?.status;
 		this.starRating = data?.difficultyRating;
 		this.length = data?.totalLength;
