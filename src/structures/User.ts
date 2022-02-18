@@ -1,10 +1,7 @@
 import type { AxiosInstance } from 'axios';
 import createAxios from '~functions/createAxios';
 import Affinity from '~affinity';
-import { UserBeatmapTypes } from '~constants';
 import defaultOptions from '~defaults';
-import Beatmap from './Beatmap';
-import BeatmapCompact from './BeatmapCompact';
 import BeatmapSet from './BeatmapSet';
 import BeatmapPlaycount from './BeatmapPlaycount';
 
@@ -122,24 +119,18 @@ class User {
 	 * Fetch beatmaps relating to this user!
 	 * @async
 	 */
-	public async fetchBeatmaps<
-		T extends UserBeatmapTypes = UserBeatmapTypes.Favourite
-	>(
+	public async fetchBeatmaps<T extends User.BeatmapTypes = 'favourite'>(
 		type?: T
-	): Promise<
-		T extends UserBeatmapTypes.MostPlayed
-			? BeatmapPlaycount[]
-			: BeatmapSet[]
-	> {
+	): Promise<T extends 'most_played' ? BeatmapPlaycount[] : BeatmapSet[]> {
 		// @ts-expect-error - ensure there is a type
-		type = type ?? UserBeatmapTypes.Favourite;
+		type = type ?? 'favourite';
 
 		// Make the request
 		const { data }: { data: any[] } = await this.#rest.get(
 			`users/${this.id}/beatmapsets/${type}`
 		);
 
-		if (type === UserBeatmapTypes.MostPlayed) {
+		if (type === 'most_played') {
 			// @ts-expect-error
 			return data.map(
 				(beatmap) => new BeatmapPlaycount(this.#client, beatmap)
@@ -153,6 +144,15 @@ class User {
 
 namespace User {
 	export type Playstyle = 'mouse' | 'keyboard' | 'tablet' | 'touch';
+
+	export type BeatmapTypes =
+		| 'favourite'
+		| 'graveyard'
+		| 'loved'
+		| 'most_played'
+		| 'pending'
+		| 'ranked'
+		| 'pending';
 
 	export interface Kudosu {
 		total: number;

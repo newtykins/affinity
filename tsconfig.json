@@ -12,7 +12,6 @@
 			"~structures/*": ["./structures/*"],
 			"~helpers/*": ["./helpers/*"],
 			"~affinity": ["./index"],
-			"~constants": ["./constants"],
 			"~errors/*": ["./errors/*"],
 			"~defaults": ["./defaultOptions"],
 			"~functions/*": ["./functions/*"]

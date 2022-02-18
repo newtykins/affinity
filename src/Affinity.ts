@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import _ from 'lodash';
 import User from '~structures/User';
-import Score, { ScoreSearchTypes } from '~structures/Score';
+import Score from '~structures/Score';
 import AuthenticationError from '~errors/AuthenticationError';
 import BadRequestError from '~errors/BadRequestError';
 import defaultOptions from '~defaults';
@@ -218,7 +218,7 @@ class Affinity {
 namespace Affinity {
 	export namespace Options {
 		export interface UserScores {
-			type: ScoreSearchTypes;
+			type: Score.SearchTypes;
 			mode: Modes;
 			includeFails?: boolean;
 			limit?: number;

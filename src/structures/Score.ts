@@ -48,9 +48,9 @@ class Score {
 		this.beatmapsetId = data?.beatmapset?.id;
 
 		this.hits = {
-			50: statistics?.['count50'],
-			100: statistics?.['count100'],
-			300: statistics?.['count300'],
+			hit50: statistics?.['count50'],
+			hit100: statistics?.['count100'],
+			hit300: statistics?.['count300'],
 			geki: statistics?.countGeki,
 			katu: statistics?.countKatu,
 			miss: statistics?.countMiss,
@@ -87,23 +87,16 @@ class Score {
 }
 
 namespace Score {
-	export type SearchTypes = 'best' | 'first' | 'recents';
+	export type SearchTypes = 'best' | 'first' | 'recent';
 
 	export interface Hits {
-		50: number;
-		100: number;
-		300: number;
+		hit50: number;
+		hit100: number;
+		hit300: number;
 		geki: number;
 		katu: number;
 		miss: number;
 	}
 }
 
-enum ScoreSearchTypes {
-	Best = 'best',
-	First = 'first',
-	Recent = 'recent',
-}
-
 export default Score;
-export { ScoreSearchTypes };
