@@ -33,7 +33,6 @@ class Score {
 
 		this.id = data?.id;
 		this.userId = data?.userId;
-		this.accuracy = data?.accuracy;
 		this.mods = data?.mods;
 		this.score = data?.score;
 		this.maximumCombo = data?.maxCombo;
@@ -46,6 +45,9 @@ class Score {
 		this.replay = data?.replay;
 		this.beatmapId = data?.beatmap?.id;
 		this.beatmapsetId = data?.beatmapset?.id;
+		this.accuracy = parseFloat(
+			(parseFloat(data?.accuracy) * 100).toFixed(2)
+		);
 
 		this.hits = {
 			hit50: statistics?.['count50'],

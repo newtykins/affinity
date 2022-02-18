@@ -4,10 +4,10 @@ import User from '~structures/User';
 import Score from '~structures/Score';
 import AuthenticationError from '~errors/AuthenticationError';
 import BadRequestError from '~errors/BadRequestError';
-import defaultOptions from '~defaults';
 import Beatmap from '~structures/Beatmap';
 import BeatmapSet from '~structures/BeatmapSet';
 import createAxios from '~functions/createAxios';
+import getApiMode from '~functions/getApiMode';
 
 interface AuthResponse {
 	token: string;
@@ -101,13 +101,16 @@ class Affinity {
 		const key = typeof query === 'number' ? 'id' : 'username';
 
 		if (await this.isLoggedIn()) {
-			const { data } = await this.#rest.get(`users/${query}/${mode}`, {
-				params: {
-					key,
-				},
-			});
+			const { data } = await this.#rest.get(
+				`users/${query}/${getApiMode(mode)}`,
+				{
+					params: {
+						key,
+					},
+				}
+			);
 
-			return new User(this, this.#token, data);
+			return new User(this, this.#token, mode, data);
 		}
 	}
 
@@ -117,7 +120,7 @@ class Affinity {
 	 */
 	public async getUserScores(
 		id: number,
-		options: Affinity.Options.UserScores = defaultOptions.userScores
+		options: Affinity.Options.UserScores = { type: 'best', mode: 'osu' }
 	): Promise<Score[]> {
 		if (await this.isLoggedIn()) {
 			// Ensure that the ID provided is a number
@@ -127,13 +130,17 @@ class Affinity {
 				);
 
 			// Make the request
-			const { type, mode, includeFails, limit, offset } = options;
+			const { type, mode, includeFails, limit, offset } = options ?? {
+				type: 'best',
+				mode: 'osu',
+			};
+
 			const { data }: { data: any[] } = await this.#rest.get(
 				`users/${id}/scores/${type}`,
 				{
 					params: {
 						include_fails: includeFails ? 1 : 0,
-						mode,
+						mode: getApiMode(mode),
 						limit,
 						offset,
 					},

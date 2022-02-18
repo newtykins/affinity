@@ -1,7 +1,6 @@
 import type { AxiosInstance } from 'axios';
 import createAxios from '~functions/createAxios';
 import Affinity from '~affinity';
-import defaultOptions from '~defaults';
 import BeatmapSet from './BeatmapSet';
 import BeatmapPlaycount from './BeatmapPlaycount';
 
@@ -9,6 +8,7 @@ class User {
 	public rawData: any;
 	#client: Affinity;
 	#rest: AxiosInstance;
+	#mode: Affinity.Modes;
 
 	public id: number;
 	public username: string;
@@ -32,10 +32,16 @@ class User {
 	public supporter: boolean;
 	public hasSupported: boolean;
 
-	constructor(client: Affinity, token: string, data: any) {
+	constructor(
+		client: Affinity,
+		token: string,
+		mode: Affinity.Modes,
+		data: any
+	) {
 		this.rawData = data;
 		this.#client = client;
 		this.#rest = createAxios(token);
+		this.#mode = mode;
 
 		const { statistics } = data;
 
@@ -110,7 +116,10 @@ class User {
 	 * @async
 	 */
 	public async fetchScores(
-		options: Affinity.Options.UserScores = defaultOptions.userScores
+		options: Affinity.Options.UserScores = {
+			type: 'best',
+			mode: this.#mode,
+		}
 	) {
 		return await this.#client.getUserScores(this.id, options);
 	}

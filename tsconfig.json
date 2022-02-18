@@ -13,7 +13,6 @@
 			"~helpers/*": ["./helpers/*"],
 			"~affinity": ["./index"],
 			"~errors/*": ["./errors/*"],
-			"~defaults": ["./defaultOptions"],
 			"~functions/*": ["./functions/*"]
 		},
 		"plugins": [{ "transform": "ts-transform-paths" }],
