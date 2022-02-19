@@ -16,7 +16,8 @@
 	"license": "ISC",
 	"dependencies": {
 		"axios": "^0.26.0",
-		"lodash": "^4.17.21"
+		"lodash": "^4.17.21",
+		"ojsama": "^2.2.0"
 	},
 	"devDependencies": {
 		"@types/gulp": "^4.0.9",

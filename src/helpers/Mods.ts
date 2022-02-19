@@ -47,7 +47,8 @@ class Mods {
 		FL: 6,
 		TD: 7,
 	};
-	public parseCode(mods: number): string {
+
+	public parseCode(mods: number): Mods.ModCombos | 'NM' {
 		const enabled: {
 			name: string;
 			order: number;
@@ -73,12 +74,14 @@ class Mods {
 			.map((a) => a.name);
 
 		// Return the mod selection or NM
-		return output.length !== 0 ? output.join('') : 'NM';
+		return output.length !== 0 ? (output.join('') as Mods.ModCombos) : 'NM';
 	}
 
-	public parseString(str: string): number {
+	public parseString(str: Mods.ModCombos): number {
+		const string = str.trim();
+
 		// Break up the string into two character pairs
-		const mods = [...str.match(/.{1,2}/g)];
+		const mods = [...string.match(/.{1,2}/g)];
 		if (!mods) return undefined;
 
 		// Calculate the final mod code value
@@ -87,6 +90,44 @@ class Mods {
 			return a + this.numCodes[b];
 		}, 0);
 	}
+}
+
+namespace Mods {
+	export type ModCombos =
+		| 'HD'
+		| 'DT'
+		| 'HR'
+		| 'FL'
+		| 'EZ'
+		| 'NF'
+		| 'HDEZ'
+		| 'HDEZNF'
+		| 'HDDT'
+		| 'HDDTNF'
+		| 'EZDT'
+		| 'EZDTNF'
+		| 'HDHR'
+		| 'HDHRNF'
+		| 'HDFL'
+		| 'HDFLNF'
+		| 'DTHR'
+		| 'DTHRNF'
+		| 'DTFL'
+		| 'DTFLNF'
+		| 'HRFL'
+		| 'HRFLNF'
+		| 'HDDTEZ'
+		| 'HDDTEZNF'
+		| 'DTHRFL'
+		| 'DTHRFLNF'
+		| 'HDDTHR'
+		| 'HDDTHRNF'
+		| 'HDHRFL'
+		| 'HDHRFLNF'
+		| 'HDDTFL'
+		| 'HDDTFLNF'
+		| 'HDDTHRFL'
+		| 'HDDTHRFLNF';
 }
 
 interface ModsData {
