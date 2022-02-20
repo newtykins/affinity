@@ -5,6 +5,7 @@ import Beatmap from './Beatmap';
 class BeatmapSet {
 	public rawData: any;
 	#client: Affinity;
+	#config: Affinity.Config;
 
 	public id: number;
 	public artist: string;
@@ -30,9 +31,10 @@ class BeatmapSet {
 	public mapper: string;
 	public mapperId: number;
 
-	constructor(client: Affinity, data: any) {
+	constructor(client: Affinity, config: Affinity.Config, data: any) {
 		this.rawData = data;
 		this.#client = client;
+		this.#config = config;
 
 		this.id = data?.id;
 		this.artist = data?.artist;
@@ -79,7 +81,9 @@ class BeatmapSet {
 	 * Fetch the mapper of the beatmap set!
 	 * @async
 	 */
-	public async fetchMapper(mode: Affinity.Modes = 'osu') {
+	public async fetchMapper(
+		mode: Affinity.Modes = this.#config.defaultGamemode
+	) {
 		return await this.#client.getUser(this.mapperId, mode);
 	}
 }

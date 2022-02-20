@@ -8,10 +8,15 @@ const clientSecret = process.env.CLIENT_SECRET;
 
 describe('The Affinity Client', () => {
 	let client: Affinity;
+	let maniaClient: Affinity;
 	let newt: User;
 
 	beforeAll(async () => {
 		client = new Affinity(clientId, clientSecret);
+		maniaClient = new Affinity(clientId, clientSecret, {
+			defaultGamemode: 'mania',
+		});
+
 		newt = await client.getUser(16009610);
 	});
 
@@ -23,6 +28,19 @@ describe('The Affinity Client', () => {
 		} catch (e) {
 			expect(e).toBeInstanceOf(AuthenticationError);
 		}
+	});
+
+	//* Config tests
+	it('uses the default gamemode when making requests', async () => {
+		const scores = await maniaClient.getUserScores(259972);
+		const lastResort = scores.find((score) => score.beatmapId === 1679790);
+		expect(lastResort).toBeDefined();
+	});
+
+	it('fails to fetch an osu! user on the mania client when the gamemode is not specified', async () => {
+		const scores = await maniaClient.getUserScores(7562902);
+		const teamMagma = scores.find((score) => score.beatmapId === 2097898);
+		expect(teamMagma).toBeUndefined();
 	});
 
 	//* User tests

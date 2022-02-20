@@ -7,6 +7,7 @@ import parseMode from '~functions/parseMode';
 class Score {
 	public rawData: any;
 	#client: Affinity;
+	#config: Affinity.Config;
 
 	public id: number;
 	public userId: number;
@@ -25,11 +26,12 @@ class Score {
 	public beatmapId: number;
 	public beatmapsetId: number;
 
-	constructor(client: Affinity, data: any) {
+	constructor(client: Affinity, config: Affinity.Config, data: any) {
 		const { statistics } = data;
 
 		this.rawData = data;
 		this.#client = client;
+		this.#config = config;
 
 		this.id = data?.id;
 		this.userId = data?.userId;
@@ -67,7 +69,9 @@ class Score {
 	 * Fetch the user associated with this score!
 	 * @async
 	 */
-	public async fetchUser(mode: Affinity.Modes = 'osu'): Promise<User> {
+	public async fetchUser(
+		mode: Affinity.Modes = this.#config.defaultGamemode
+	): Promise<User> {
 		return await this.#client.getUser(this.userId, mode);
 	}
 

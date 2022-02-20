@@ -1,3 +1,4 @@
--   Potentially return Maps rather than arrays?
--   Set default game mode on Client
--   More accurate PP calculator
+-   [ ] Potentially return Maps rather than arrays?
+-   [x] Set default game mode on Client
+-   [ ] Allow for config to be updated
+-   [ ] More accurate PP calculator

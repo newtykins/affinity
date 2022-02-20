@@ -22,8 +22,13 @@ class Affinity {
 	#rest: AxiosInstance;
 	#authenticated: boolean = false;
 	#token: string;
+	private config: Affinity.Config;
 
-	constructor(clientId: number, clientSecret: string) {
+	constructor(
+		clientId: number,
+		clientSecret: string,
+		config?: Affinity.Config
+	) {
 		if (!clientId)
 			throw new AuthenticationError(
 				'You must provide an id for the client!'
@@ -34,6 +39,10 @@ class Affinity {
 		// Store the client credentials
 		this.#clientId = clientId;
 		this.#clientSecret = clientSecret;
+
+		// Set the config
+		this.config = config ?? {};
+		this.config.defaultGamemode ??= 'osu';
 
 		// Create the REST client
 		this.#rest = createAxios();
@@ -96,7 +105,7 @@ class Affinity {
 	 */
 	public async getUser(
 		query: string | number,
-		mode: Affinity.Modes = 'osu'
+		mode: Affinity.Modes = this.config.defaultGamemode
 	): Promise<User> {
 		const key = typeof query === 'number' ? 'id' : 'username';
 
@@ -120,7 +129,10 @@ class Affinity {
 	 */
 	public async getUserScores(
 		id: number,
-		options: Affinity.Options.UserScores = { type: 'best', mode: 'osu' }
+		options: Affinity.Options.UserScores = {
+			type: 'best',
+			mode: this.config.defaultGamemode,
+		}
 	): Promise<Score[]> {
 		if (await this.isLoggedIn()) {
 			// Ensure that the ID provided is a number
@@ -132,7 +144,7 @@ class Affinity {
 			// Make the request
 			const { type, mode, includeFails, limit, offset } = options ?? {
 				type: 'best',
-				mode: 'osu',
+				mode: this.config.defaultGamemode,
 			};
 
 			const { data }: { data: any[] } = await this.#rest.get(
@@ -148,7 +160,7 @@ class Affinity {
 			);
 
 			// Turn the data from the API into Affinity-wrapped scores
-			return data.map((score) => new Score(this, score));
+			return data.map((score) => new Score(this, this.config, score));
 		}
 	}
 
@@ -186,7 +198,7 @@ class Affinity {
 			// Make the request
 			const { data } = await this.#rest.get(`beatmapsets/${id}`);
 
-			return new BeatmapSet(this, data);
+			return new BeatmapSet(this, this.config, data);
 		}
 	}
 
@@ -216,13 +228,19 @@ class Affinity {
 			);
 
 			return beatmapsets.map(
-				(beatmapset) => new BeatmapSet(this, beatmapset)
+				(beatmapset) => new BeatmapSet(this, this.config, beatmapset)
 			);
 		}
 	}
 }
 
 namespace Affinity {
+	export type Modes = 'osu' | 'ctb' | 'mania' | 'taiko';
+
+	export interface Config {
+		defaultGamemode?: Modes;
+	}
+
 	export namespace Options {
 		export interface UserScores {
 			type: Score.SearchTypes;
@@ -241,8 +259,6 @@ namespace Affinity {
 			nsfw?: boolean;
 		}
 	}
-
-	export type Modes = 'osu' | 'ctb' | 'mania' | 'taiko';
 }
 
 export default Affinity;
