@@ -3,6 +3,7 @@ import createAxios from '~functions/createAxios';
 import Affinity from '~affinity';
 import BeatmapSet from './BeatmapSet';
 import BeatmapPlaycount from './BeatmapPlaycount';
+import links from '~helpers/links';
 
 class User {
 	public rawData: any;
@@ -15,7 +16,6 @@ class User {
 	public avatar: string;
 	public coverUrl: string;
 	public joinDate: Date;
-	public playstyle: User.Playstyle[];
 	public kudosu: User.Kudosu;
 	public profile: User.Profile;
 	public country: User.Country;
@@ -25,12 +25,12 @@ class User {
 	public achievements: User.Achievement[];
 	public rankHistory: User.RankHistory;
 	public previousUsernames: string[];
-
-	public active: boolean;
-	public bot: boolean;
-	public online: boolean;
-	public supporter: boolean;
+	public isActive: boolean;
+	public isBot: boolean;
+	public isOnline: boolean;
+	public currentSupporter: boolean;
 	public hasSupported: boolean;
+	public playstyles: User.Playstyle[];
 
 	constructor(
 		client: Affinity,
@@ -50,13 +50,13 @@ class User {
 		this.avatar = data?.avatarUrl;
 		this.coverUrl = data?.coverUrl;
 		this.joinDate = new Date(data?.joinDate);
-		this.playstyle = data?.playstyle;
+		this.playstyles = data?.playstyle;
 		this.kudosu = data?.kudosu;
 		this.country = data?.country;
-		this.active = data?.isActive;
-		this.bot = data?.isBot;
-		this.online = data?.isOnline;
-		this.supporter = data?.isSupporter;
+		this.isActive = data?.isActive;
+		this.isBot = data?.isBot;
+		this.isOnline = data?.isOnline;
+		this.currentSupporter = data?.isSupporter;
 		this.hasSupported = data?.hasSupported;
 
 		this.profile = {
@@ -108,7 +108,7 @@ class User {
 	}
 
 	public get url() {
-		return `https://osu.ppy.sh/u/${this.id}`;
+		return links.user(this.id);
 	}
 
 	/**

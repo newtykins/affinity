@@ -3,6 +3,7 @@ import User from './User';
 import Beatmap from './Beatmap';
 import BeatmapSet from './BeatmapSet';
 import parseMode from '~functions/parseMode';
+import links from '~helpers/links';
 
 class Score {
 	public rawData: any;
@@ -22,9 +23,9 @@ class Score {
 	public createdAt: Date;
 	public pp: number;
 	public mode: Affinity.Modes;
-	public replay: boolean;
+	public hasReplay: boolean;
 	public beatmapId: number;
-	public beatmapsetId: number;
+	public beatmapSetId: number;
 
 	constructor(client: Affinity, config: Affinity.Config, data: any) {
 		const { statistics } = data;
@@ -44,9 +45,9 @@ class Score {
 		this.createdAt = new Date(data?.createdAt);
 		this.pp = data?.pp;
 		this.mode = parseMode(data?.mode);
-		this.replay = data?.replay;
+		this.hasReplay = data?.replay;
 		this.beatmapId = data?.beatmap?.id;
-		this.beatmapsetId = data?.beatmapset?.id;
+		this.beatmapSetId = data?.beatmapset?.id;
 		this.accuracy = parseFloat(
 			(parseFloat(data?.accuracy) * 100).toFixed(2)
 		);
@@ -62,7 +63,7 @@ class Score {
 	}
 
 	public get url() {
-		return `https://osu.ppy.sh/scores/${this.mode}/${this.id}`;
+		return links.score(this.mode, this.id);
 	}
 
 	/**
@@ -88,7 +89,7 @@ class Score {
 	 * @async
 	 */
 	public async fetchBeatmapSet(): Promise<BeatmapSet> {
-		return await this.#client.getBeatmapSet(this.beatmapsetId);
+		return await this.#client.getBeatmapSet(this.beatmapSetId);
 	}
 }
 

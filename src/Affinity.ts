@@ -14,8 +14,9 @@ interface AuthResponse {
 	expires: number;
 }
 
-// todo: comments
-// todo: add more filters
+/**
+ * The Affinity client!
+ */
 class Affinity {
 	#clientId: number;
 	#clientSecret: string;
@@ -100,7 +101,18 @@ class Affinity {
 	}
 
 	/**
-	 * Fetch data about a user!
+	 * Update config on the client!
+	 */
+	public updateConfig(config: Partial<Affinity.Config>) {
+		for (const key in config) {
+			this.config[key] = config[key];
+		}
+
+		return this;
+	}
+
+	/**
+	 * Fetch a user by their username or ID!
 	 * @async
 	 */
 	public async getUser(
@@ -124,7 +136,7 @@ class Affinity {
 	}
 
 	/**
-	 * Fetch data about a user's scores by looking them up using their id!
+	 * Fetch a user's scores using their ID!
 	 * @async
 	 */
 	public async getUserScores(
@@ -165,7 +177,7 @@ class Affinity {
 	}
 
 	/**
-	 * Fetch data about a beatmap by its id!
+	 * Fetch a beatmap by its ID!
 	 * @async
 	 */
 	public async getBeatmap(id: number) {
@@ -184,7 +196,7 @@ class Affinity {
 	}
 
 	/**
-	 * Fetch data about a beatmap set by its id!
+	 * Fetch a beatmap set by its ID!
 	 * @async
 	 */
 	public async getBeatmapSet(id: number): Promise<BeatmapSet> {
@@ -202,10 +214,14 @@ class Affinity {
 		}
 	}
 
+	/**
+	 * Search beatmap sets with a query - returns a list of search results
+	 */
 	public async searchBeatmapSets(
 		query: string,
 		options: Affinity.Options.SearchBeatmapSets = {}
 	): Promise<BeatmapSet[]> {
+		// todo: support pagination
 		const { mode, rankedStatus, genre, language, include, nsfw } = options;
 
 		if (await this.isLoggedIn()) {

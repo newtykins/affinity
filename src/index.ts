@@ -1,9 +1,9 @@
 import Affinity from './Affinity';
-import Mods from '~helpers/Mods';
+import mods from '~helpers/mods';
+import links from '~helpers/links';
 import calculateAccuracy from '~helpers/calculateAccuracy';
 import calculateStdPp from '~helpers/calculateStdPp';
 
-const mods = new Mods();
-export { mods as Mods, calculateAccuracy, calculateStdPp };
+export { mods, links, calculateAccuracy, calculateStdPp };
 
 export default Affinity;

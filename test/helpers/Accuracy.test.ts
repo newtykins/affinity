@@ -1,4 +1,5 @@
-import Affinity, { calculateAccuracy } from '~affinity';
+import Affinity from '~affinity';
+import calculateAccuracy from '~helpers/calculateAccuracy';
 import User from '~structures/User';
 
 const getScore = async (user: User, beatmapId: number) => {

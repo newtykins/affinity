@@ -2,7 +2,7 @@ import ojsama from 'ojsama';
 import axios from 'axios';
 import Score from '~structures/Score';
 import calculateAccuracy from './calculateAccuracy';
-import Mods from './Mods';
+import modsHelper, { ModCombos } from './mods';
 
 type HitAccuracy = Omit<Score.Hits, 'geki' | 'katu' | 'miss'>;
 
@@ -10,7 +10,7 @@ interface PPStats {
 	accuracy?: number | HitAccuracy;
 	combo?: number;
 	miss?: number;
-	mods?: Mods.ModCombos;
+	mods?: ModCombos;
 }
 
 interface PPResult {
@@ -51,7 +51,7 @@ export default async function calculateStdPp(
 	const map = parser.map;
 	const stars = new ojsama.diff().calc({
 		map,
-		mods: mods ? new Mods().parseString(mods) : null,
+		mods: mods ? modsHelper.parseString(mods) : null,
 	});
 	const maxCombo = map.max_combo();
 

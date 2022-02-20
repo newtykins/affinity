@@ -2,6 +2,7 @@ import Affinity from '~affinity';
 import BeatmapSet from './BeatmapSet';
 import User from './User';
 import parseMode from '~functions/parseMode';
+import links from '~helpers/links';
 
 class BeatmapCompact {
 	#client: Affinity;
@@ -29,7 +30,7 @@ class BeatmapCompact {
 	}
 
 	public get url() {
-		return `https://osu.ppy.sh/b/${this.id}`;
+		return links.beatmap(this.id);
 	}
 
 	/**
@@ -48,7 +49,5 @@ class BeatmapCompact {
 		return await this.#client.getBeatmapSet(this.beatmapsetId);
 	}
 }
-
-namespace BeatmapCompact {}
 
 export default BeatmapCompact;

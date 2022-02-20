@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import Affinity from '~affinity';
+import links from '~helpers/links';
 import Beatmap from './Beatmap';
 
 class BeatmapSet {
@@ -75,6 +76,10 @@ class BeatmapSet {
 			this.covers[_.camelCase(key).replace('X', 'x').replace('@', '')] =
 				data?.covers[key];
 		});
+	}
+
+	public get url() {
+		return links.beatmapSet(this.id);
 	}
 
 	/**

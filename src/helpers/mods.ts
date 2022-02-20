@@ -48,7 +48,7 @@ class Mods {
 		TD: 7,
 	};
 
-	public parseCode(mods: number): Mods.ModCombos | 'NM' {
+	public parseCode(mods: number): ModCombos | 'NM' {
 		const enabled: {
 			name: string;
 			order: number;
@@ -74,10 +74,10 @@ class Mods {
 			.map((a) => a.name);
 
 		// Return the mod selection or NM
-		return output.length !== 0 ? (output.join('') as Mods.ModCombos) : 'NM';
+		return output.length !== 0 ? (output.join('') as ModCombos) : 'NM';
 	}
 
-	public parseString(str: Mods.ModCombos): number {
+	public parseString(str: ModCombos): number {
 		const string = str.trim();
 
 		// Break up the string into two character pairs
@@ -92,46 +92,44 @@ class Mods {
 	}
 }
 
-namespace Mods {
-	export type ModCombos =
-		| 'HD'
-		| 'DT'
-		| 'HR'
-		| 'FL'
-		| 'EZ'
-		| 'NF'
-		| 'HDEZ'
-		| 'HDEZNF'
-		| 'HDDT'
-		| 'HDDTNF'
-		| 'EZDT'
-		| 'EZDTNF'
-		| 'HDHR'
-		| 'HDHRNF'
-		| 'HDFL'
-		| 'HDFLNF'
-		| 'DTHR'
-		| 'DTHRNF'
-		| 'DTFL'
-		| 'DTFLNF'
-		| 'HRFL'
-		| 'HRFLNF'
-		| 'HDDTEZ'
-		| 'HDDTEZNF'
-		| 'DTHRFL'
-		| 'DTHRFLNF'
-		| 'HDDTHR'
-		| 'HDDTHRNF'
-		| 'HDHRFL'
-		| 'HDHRFLNF'
-		| 'HDDTFL'
-		| 'HDDTFLNF'
-		| 'HDDTHRFL'
-		| 'HDDTHRFLNF';
-}
+export type ModCombos =
+	| 'HD'
+	| 'DT'
+	| 'HR'
+	| 'FL'
+	| 'EZ'
+	| 'NF'
+	| 'HDEZ'
+	| 'HDEZNF'
+	| 'HDDT'
+	| 'HDDTNF'
+	| 'EZDT'
+	| 'EZDTNF'
+	| 'HDHR'
+	| 'HDHRNF'
+	| 'HDFL'
+	| 'HDFLNF'
+	| 'DTHR'
+	| 'DTHRNF'
+	| 'DTFL'
+	| 'DTFLNF'
+	| 'HRFL'
+	| 'HRFLNF'
+	| 'HDDTEZ'
+	| 'HDDTEZNF'
+	| 'DTHRFL'
+	| 'DTHRFLNF'
+	| 'HDDTHR'
+	| 'HDDTHRNF'
+	| 'HDHRFL'
+	| 'HDHRFLNF'
+	| 'HDDTFL'
+	| 'HDDTFLNF'
+	| 'HDDTHRFL'
+	| 'HDDTHRFLNF';
 
 interface ModsData {
 	[key: string]: number;
 }
 
-export default Mods;
+export default new Mods();

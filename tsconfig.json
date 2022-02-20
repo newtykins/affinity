@@ -11,7 +11,7 @@
 		"paths": {
 			"~structures/*": ["./structures/*"],
 			"~helpers/*": ["./helpers/*"],
-			"~affinity": ["./index"],
+			"~affinity": ["./Affinity"],
 			"~errors/*": ["./errors/*"],
 			"~functions/*": ["./functions/*"]
 		},
