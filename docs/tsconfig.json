@@ -1,7 +1,13 @@
 {
-  // This file is not used in compilation. It is here just for a nice editor experience.
-  "extends": "@tsconfig/docusaurus/tsconfig.json",
-  "compilerOptions": {
-    "baseUrl": "."
-  }
+	// This file is not used in compilation. It is here just for a nice editor experience.
+	"extends": "@tsconfig/docusaurus/tsconfig.json",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"~structures/*": ["../src/structures/*"],
+			"~helpers/*": ["../src/helpers/*"],
+			"~affinity": ["../src/Affinity"],
+			"~functions/*": ["../src/functions/*"]
+		}
+	}
 }

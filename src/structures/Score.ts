@@ -1,12 +1,14 @@
-import { GameMode } from '~constants';
 import Affinity from '~affinity';
 import User from './User';
 import Beatmap from './Beatmap';
 import BeatmapSet from './BeatmapSet';
+import parseMode from '~functions/parseMode';
+import links from '~helpers/links';
 
 class Score {
 	public rawData: any;
 	#client: Affinity;
+	#config: Affinity.Config;
 
 	public id: number;
 	public userId: number;
@@ -20,54 +22,74 @@ class Score {
 	public rank: string;
 	public createdAt: Date;
 	public pp: number;
-	public mode: GameMode;
-	public replay: boolean;
+	public mode: Affinity.Modes;
+	public hasReplay: boolean;
 	public beatmapId: number;
-	public beatmapsetId: number;
+	public beatmapSetId: number;
 
-	constructor(client: Affinity, data: any) {
+	constructor(client: Affinity, config: Affinity.Config, data: any) {
+		const { statistics } = data;
+
 		this.rawData = data;
 		this.#client = client;
-
-		const { statistics } = data;
+		this.#config = config;
 
 		this.id = data?.id;
 		this.userId = data?.userId;
-		this.accuracy = data?.accuracy;
 		this.mods = data?.mods;
 		this.score = data?.score;
 		this.maximumCombo = data?.maxCombo;
 		this.passed = data?.passed;
 		this.perfect = data?.perfect;
+		this.rank = data?.rank;
+		this.createdAt = new Date(data?.createdAt);
+		this.pp = data?.pp;
+		this.mode = parseMode(data?.mode);
+		this.hasReplay = data?.replay;
+		this.beatmapId = data?.beatmap?.id;
+		this.beatmapSetId = data?.beatmapset?.id;
+		this.accuracy = parseFloat(
+			(parseFloat(data?.accuracy) * 100).toFixed(2)
+		);
 
 		this.hits = {
-			50: statistics?.['count50'],
-			100: statistics?.['count100'],
-			300: statistics?.['count300'],
+			hit50: statistics?.['count50'],
+			hit100: statistics?.['count100'],
+			hit300: statistics?.['count300'],
 			geki: statistics?.countGeki,
 			katu: statistics?.countKatu,
 			miss: statistics?.countMiss,
 		};
-
-		this.rank = data?.rank;
-		this.createdAt = new Date(data?.createdAt);
-		this.pp = data?.pp;
-		this.mode = data?.mode;
-		this.replay = data?.replay;
-		this.beatmapId = data?.beatmap?.id;
-		this.beatmapsetId = data?.beatmapset?.id;
 	}
 
 	public get url() {
-		return `https://osu.ppy.sh/scores/${this.mode}/${this.id}`;
+		return links.score(this.mode, this.id);
 	}
 
 	/**
 	 * Fetch the user associated with this score!
 	 * @async
 	 */
-	public async fetchUser(mode: GameMode = GameMode.Standard): Promise<User> {
+	public async fetchUser(
+		mode: Affinity.Modes = this.#config.defaultGamemode
+	): Promise<User> {
 		return await this.#client.getUser(this.userId, mode);
+	}
+
+	/**
+	 * Fetch the beatmap this score was set on!
+	 * @async
+	 */
+	public async fetchBeatmap(): Promise<Beatmap> {
+		return await this.#client.getBeatmap(this.beatmapId);
+	}
+
+	/**
+	 * Fetch the beatmap set of the beatmap this score was set on!
+	 * @async
+	 */
+	public async fetchBeatmapSet(): Promise<BeatmapSet> {
+		return await this.#client.getBeatmapSet(this.beatmapSetId);
 	}
 
 	/**
@@ -90,12 +112,12 @@ class Score {
 }
 
 namespace Score {
-	export type SearchTypes = 'best' | 'first' | 'recents';
+	export type SearchTypes = 'best' | 'first' | 'recent';
 
 	export interface Hits {
-		50: number;
-		100: number;
-		300: number;
+		hit50: number;
+		hit100: number;
+		hit300: number;
 		geki: number;
 		katu: number;
 		miss: number;

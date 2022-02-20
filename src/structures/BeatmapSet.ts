@@ -1,11 +1,12 @@
 import _ from 'lodash';
 import Affinity from '~affinity';
-import { GameMode, Genre, RankStatus } from '~constants';
+import links from '~helpers/links';
 import Beatmap from './Beatmap';
 
 class BeatmapSet {
 	public rawData: any;
 	#client: Affinity;
+	#config: Affinity.Config;
 
 	public id: number;
 	public artist: string;
@@ -16,14 +17,14 @@ class BeatmapSet {
 	public nsfw: boolean;
 	public playCount: number;
 	public preview: string;
-	public status: keyof typeof RankStatus;
+	public status: BeatmapSet.RankStatus;
 	public bpm: number;
 	public lastUpdated: Date;
 	public rankedDate: Date;
 	public submittedDate: Date;
 	public tags: string[];
 	public beatmaps: Beatmap[];
-	public genre: Genre;
+	public genre: BeatmapSet.Genre;
 
 	/**
 	 * The mapper's name at the time of the set's submission - potentially outdated.
@@ -31,9 +32,10 @@ class BeatmapSet {
 	public mapper: string;
 	public mapperId: number;
 
-	constructor(client: Affinity, data: any) {
+	constructor(client: Affinity, config: Affinity.Config, data: any) {
 		this.rawData = data;
 		this.#client = client;
+		this.#config = config;
 
 		this.id = data?.id;
 		this.artist = data?.artist;
@@ -67,8 +69,8 @@ class BeatmapSet {
 			}
 		);
 
-		// @ts-ignore
-		this.covers = {};
+		// @ts-expect-error - going to be populated momentarily
+		this.covers = Object.keys(data?.covers).length > 0 ? {} : null;
 
 		Object.keys(data?.covers).forEach((key) => {
 			this.covers[_.camelCase(key).replace('X', 'x').replace('@', '')] =
@@ -76,11 +78,17 @@ class BeatmapSet {
 		});
 	}
 
+	public get url() {
+		return links.beatmapSet(this.id);
+	}
+
 	/**
 	 * Fetch the mapper of the beatmap set!
 	 * @async
 	 */
-	public async fetchMapper(mode: GameMode = GameMode.Standard) {
+	public async fetchMapper(
+		mode: Affinity.Modes = this.#config.defaultGamemode
+	) {
 		return await this.#client.getUser(this.mapperId, mode);
 	}
 }
@@ -96,6 +104,45 @@ namespace BeatmapSet {
 		slimCover: string;
 		slimCover2x: string;
 	}
+
+	export type Genre =
+		| 'unspecified'
+		| 'video game'
+		| 'anime'
+		| 'rock'
+		| 'pop'
+		| 'other'
+		| 'novelty'
+		| 'hip hop'
+		| 'electronic'
+		| 'metal'
+		| 'classical'
+		| 'folk'
+		| 'jazz';
+
+	export type Language =
+		| 'english'
+		| 'chinese'
+		| 'french'
+		| 'german'
+		| 'italian'
+		| 'japanese'
+		| 'korean'
+		| 'spanish'
+		| 'swedish'
+		| 'russian'
+		| 'polish'
+		| 'instrumental'
+		| 'unspecified';
+
+	export type RankStatus =
+		| 'graveyard'
+		| 'wip'
+		| 'pending'
+		| 'ranked'
+		| 'approved'
+		| 'qualified'
+		| 'loved';
 }
 
 export default BeatmapSet;

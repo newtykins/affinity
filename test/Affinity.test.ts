@@ -8,13 +8,16 @@ const clientSecret = process.env.CLIENT_SECRET;
 
 describe('The Affinity Client', () => {
 	let client: Affinity;
-	let newtUser: User;
+	let maniaClient: Affinity;
+	let newt: User;
 
 	beforeAll(async () => {
 		client = new Affinity(clientId, clientSecret);
-		await client.login();
+		maniaClient = new Affinity(clientId, clientSecret, {
+			defaultGamemode: 'mania',
+		});
 
-		newtUser = await client.getUser(16009610);
+		newt = await client.getUser(16009610);
 	});
 
 	//* Login tests
@@ -27,9 +30,17 @@ describe('The Affinity Client', () => {
 		}
 	});
 
-	it('can log into the API using client credentials', async () => {
-		const differentClient = new Affinity(clientId, clientSecret);
-		expect(await differentClient.login()).toBe(true);
+	//* Config tests
+	it('uses the default gamemode when making requests', async () => {
+		const scores = await maniaClient.getUserScores(259972);
+		const lastResort = scores.find((score) => score.beatmapId === 1679790);
+		expect(lastResort).toBeDefined();
+	});
+
+	it('fails to fetch an osu! user on the mania client when the gamemode is not specified', async () => {
+		const scores = await maniaClient.getUserScores(7562902);
+		const teamMagma = scores.find((score) => score.beatmapId === 2097898);
+		expect(teamMagma).toBeUndefined();
 	});
 
 	it('can not use a method when not logged in', async () => {
@@ -43,20 +54,20 @@ describe('The Affinity Client', () => {
 
 	//* User tests
 	it('finds the correct id for the username "Newt x3"', async () => {
-		const data = await client.getUser(newtUser.username);
-		expect(data.id).toBe(newtUser.id);
+		const data = await client.getUser(newt.username);
+		expect(data.id).toBe(newt.id);
 	});
 
 	//* User Score tests
 	it("can find a user's best scores", async () => {
-		const [score] = await client.getUserScores(newtUser.id);
-		expect(score.userId).toBe(newtUser.id);
+		const [score] = await client.getUserScores(newt.id);
+		expect(score.userId).toBe(newt.id);
 	});
 
 	it('throws an error when you try looking for scores with a username', async () => {
 		try {
 			// @ts-ignore
-			const [score] = await client.getUserScores(newtUser.username);
+			const [score] = await client.getUserScores(newt.username);
 		} catch (e) {
 			expect(e).toBeInstanceOf(BadRequestError);
 		}

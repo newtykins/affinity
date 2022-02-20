@@ -11,10 +11,9 @@
 		"paths": {
 			"~structures/*": ["./structures/*"],
 			"~helpers/*": ["./helpers/*"],
-			"~affinity": ["./index"],
-			"~constants": ["./constants"],
+			"~affinity": ["./Affinity"],
 			"~errors/*": ["./errors/*"],
-			"~defaults": ["./defaultOptions"]
+			"~functions/*": ["./functions/*"]
 		},
 		"plugins": [{ "transform": "ts-transform-paths" }],
 		"declaration": true

@@ -1,16 +1,21 @@
+import type { AxiosInstance } from 'axios';
+import createAxios from '~functions/createAxios';
 import Affinity from '~affinity';
-import defaultOptions from '~defaults';
+import BeatmapSet from './BeatmapSet';
+import BeatmapPlaycount from './BeatmapPlaycount';
+import links from '~helpers/links';
 
 class User {
 	public rawData: any;
 	#client: Affinity;
+	#rest: AxiosInstance;
+	#mode: Affinity.Modes;
 
 	public id: number;
 	public username: string;
 	public avatar: string;
 	public coverUrl: string;
 	public joinDate: Date;
-	public playstyle: User.Playstyle[];
 	public kudosu: User.Kudosu;
 	public profile: User.Profile;
 	public country: User.Country;
@@ -20,16 +25,23 @@ class User {
 	public achievements: User.Achievement[];
 	public rankHistory: User.RankHistory;
 	public previousUsernames: string[];
-
-	public active: boolean;
-	public bot: boolean;
-	public online: boolean;
-	public supporter: boolean;
+	public isActive: boolean;
+	public isBot: boolean;
+	public isOnline: boolean;
+	public currentSupporter: boolean;
 	public hasSupported: boolean;
+	public playstyles: User.Playstyle[];
 
-	constructor(client: Affinity, data: any) {
+	constructor(
+		client: Affinity,
+		token: string,
+		mode: Affinity.Modes,
+		data: any
+	) {
 		this.rawData = data;
 		this.#client = client;
+		this.#rest = createAxios(token);
+		this.#mode = mode;
 
 		const { statistics } = data;
 
@@ -38,13 +50,13 @@ class User {
 		this.avatar = data?.avatarUrl;
 		this.coverUrl = data?.coverUrl;
 		this.joinDate = new Date(data?.joinDate);
-		this.playstyle = data?.playstyle;
+		this.playstyles = data?.playstyle;
 		this.kudosu = data?.kudosu;
 		this.country = data?.country;
-		this.active = data?.isActive;
-		this.bot = data?.isBot;
-		this.online = data?.isOnline;
-		this.supporter = data?.isSupporter;
+		this.isActive = data?.isActive;
+		this.isBot = data?.isBot;
+		this.isOnline = data?.isOnline;
+		this.currentSupporter = data?.isSupporter;
 		this.hasSupported = data?.hasSupported;
 
 		this.profile = {
@@ -96,7 +108,7 @@ class User {
 	}
 
 	public get url() {
-		return `https://osu.ppy.sh/u/${this.id}`;
+		return links.user(this.id);
 	}
 
 	/**
@@ -104,14 +116,52 @@ class User {
 	 * @async
 	 */
 	public async fetchScores(
-		options: Affinity.Options.UserScores = defaultOptions.userScores
+		options: Affinity.Options.UserScores = {
+			type: 'best',
+			mode: this.#mode,
+		}
 	) {
 		return await this.#client.getUserScores(this.id, options);
+	}
+
+	/**
+	 * Fetch beatmaps relating to this user!
+	 * @async
+	 */
+	public async fetchBeatmaps<T extends User.BeatmapTypes = 'favourite'>(
+		type?: T
+	): Promise<T extends 'most_played' ? BeatmapPlaycount[] : BeatmapSet[]> {
+		// @ts-expect-error - ensure there is a type
+		type = type ?? 'favourite';
+
+		// Make the request
+		const { data }: { data: any[] } = await this.#rest.get(
+			`users/${this.id}/beatmapsets/${type}`
+		);
+
+		if (type === 'most_played') {
+			// @ts-expect-error
+			return data.map(
+				(beatmap) => new BeatmapPlaycount(this.#client, beatmap)
+			);
+		} else {
+			// @ts-expect-error
+			return data.map((beatmap) => new BeatmapSet(this.#client, beatmap));
+		}
 	}
 }
 
 namespace User {
 	export type Playstyle = 'mouse' | 'keyboard' | 'tablet' | 'touch';
+
+	export type BeatmapTypes =
+		| 'favourite'
+		| 'graveyard'
+		| 'loved'
+		| 'most_played'
+		| 'pending'
+		| 'ranked'
+		| 'pending';
 
 	export interface Kudosu {
 		total: number;

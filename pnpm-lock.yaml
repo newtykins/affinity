@@ -17,10 +17,12 @@ specifiers:
     husky: ^7.0.4
     jest: ^27.5.1
     lodash: ^4.17.21
+    ojsama: ^2.2.0
     prettier: ^2.5.1
     pretty-quick: ^3.1.3
     rimraf: ^3.0.2
     ts-jest: ^27.1.3
+    ts-node: ^10.5.0
     ts-transform-paths: ^2.0.3
     ttypescript: ^1.5.13
     typescript: ^4.5.5
@@ -28,6 +30,7 @@ specifiers:
 dependencies:
     axios: 0.26.0
     lodash: 4.17.21
+    ojsama: 2.2.0
 
 devDependencies:
     '@types/gulp': 4.0.9
@@ -43,13 +46,14 @@ devDependencies:
     gulp-typescript: 6.0.0-alpha.1_typescript@4.5.5
     gulp-uglify: 3.0.2
     husky: 7.0.4
-    jest: 27.5.1
+    jest: 27.5.1_ts-node@10.5.0
     prettier: 2.5.1
     pretty-quick: 3.1.3_prettier@2.5.1
     rimraf: 3.0.2
     ts-jest: 27.1.3_1e2406a8ca2ae3dc934d01f9ee2aebbb
+    ts-node: 10.5.0_f3bd4037939c2ed2942ba074291f8ef2
     ts-transform-paths: 2.0.3
-    ttypescript: 1.5.13_typescript@4.5.5
+    ttypescript: 1.5.13_ts-node@10.5.0+typescript@4.5.5
     typescript: 4.5.5
 
 packages:
@@ -574,7 +578,6 @@ packages:
             }
         engines: { node: '>= 12' }
         dev: true
-        optional: true
 
     /@cspotcode/source-map-support/0.7.0:
         resolution:
@@ -585,7 +588,6 @@ packages:
         dependencies:
             '@cspotcode/source-map-consumer': 0.8.0
         dev: true
-        optional: true
 
     /@istanbuljs/load-nyc-config/1.1.0:
         resolution:
@@ -624,7 +626,7 @@ packages:
             slash: 3.0.0
         dev: true
 
-    /@jest/core/27.5.1:
+    /@jest/core/27.5.1_ts-node@10.5.0:
         resolution:
             {
                 integrity: sha512-AK6/UTrvQD0Cd24NSqmIA6rKsu0tKIxfiCducZvqxYdmMisOYAsdItspT+fQDQYARPf8XgjAFZi0ogW2agH5nQ==,
@@ -648,7 +650,7 @@ packages:
             exit: 0.1.2
             graceful-fs: 4.2.9
             jest-changed-files: 27.5.1
-            jest-config: 27.5.1
+            jest-config: 27.5.1_ts-node@10.5.0
             jest-haste-map: 27.5.1
             jest-message-util: 27.5.1
             jest-regex-util: 27.5.1
@@ -890,7 +892,6 @@ packages:
                 integrity: sha512-6XFfSQmMgq0CFLY1MslA/CPUfhIL919M1rMsa5lP2P097N2Wd1sSX0tx1u4olM16fLNhtHZpRhedZJphNJqmZg==,
             }
         dev: true
-        optional: true
 
     /@tsconfig/node12/1.0.9:
         resolution:
@@ -898,7 +899,6 @@ packages:
                 integrity: sha512-/yBMcem+fbvhSREH+s14YJi18sp7J9jpuhYByADT2rypfajMZZN4WQ6zBGgBKp53NKmqI36wFYDb3yaMPurITw==,
             }
         dev: true
-        optional: true
 
     /@tsconfig/node14/1.0.1:
         resolution:
@@ -906,7 +906,6 @@ packages:
                 integrity: sha512-509r2+yARFfHHE7T6Puu2jjkoycftovhXRqW328PDXTVGKihlb1P8Z9mMZH04ebyajfRY7dedfGynlrFHJUQCg==,
             }
         dev: true
-        optional: true
 
     /@tsconfig/node16/1.0.2:
         resolution:
@@ -914,7 +913,6 @@ packages:
                 integrity: sha512-eZxlbI8GZscaGS7kkc/trHTT5xgrjH3/1n2JDwusC9iahPKWMRvRjJSAN5mCXviuTGQ/lHnhvv8Q1YTpnfz9gA==,
             }
         dev: true
-        optional: true
 
     /@types/babel__core/7.1.18:
         resolution:
@@ -1188,7 +1186,6 @@ packages:
             }
         engines: { node: '>=0.4.0' }
         dev: true
-        optional: true
 
     /acorn/7.4.1:
         resolution:
@@ -1373,7 +1370,6 @@ packages:
                 integrity: sha512-58S9QDqG0Xx27YwPSt9fJxivjYl432YCwfDMfZ+71RAqUrZef7LrKQZ3LHLOwCS4FLNBplP533Zx895SeOCHvA==,
             }
         dev: true
-        optional: true
 
     /argparse/1.0.10:
         resolution:
@@ -2247,7 +2243,6 @@ packages:
                 integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==,
             }
         dev: true
-        optional: true
 
     /cross-spawn/7.0.3:
         resolution:
@@ -2498,7 +2493,6 @@ packages:
             }
         engines: { node: '>=0.3.1' }
         dev: true
-        optional: true
 
     /domexception/2.0.1:
         resolution:
@@ -4040,7 +4034,7 @@ packages:
             - supports-color
         dev: true
 
-    /jest-cli/27.5.1:
+    /jest-cli/27.5.1_ts-node@10.5.0:
         resolution:
             {
                 integrity: sha512-Hc6HOOwYq4/74/c62dEE3r5elx8wjYqxY0r0G/nFrLDPMFRu6RA/u8qINOIkvhxG7mMQ5EJsOGfRpI8L6eFUVw==,
@@ -4053,14 +4047,14 @@ packages:
             node-notifier:
                 optional: true
         dependencies:
-            '@jest/core': 27.5.1
+            '@jest/core': 27.5.1_ts-node@10.5.0
             '@jest/test-result': 27.5.1
             '@jest/types': 27.5.1
             chalk: 4.1.2
             exit: 0.1.2
             graceful-fs: 4.2.9
             import-local: 3.1.0
-            jest-config: 27.5.1
+            jest-config: 27.5.1_ts-node@10.5.0
             jest-util: 27.5.1
             jest-validate: 27.5.1
             prompts: 2.4.2
@@ -4073,7 +4067,7 @@ packages:
             - utf-8-validate
         dev: true
 
-    /jest-config/27.5.1:
+    /jest-config/27.5.1_ts-node@10.5.0:
         resolution:
             {
                 integrity: sha512-5sAsjm6tGdsVbW9ahcChPAFCk4IlkQUknH5AvKjuLTSlcO/wCZKyFdn7Rg0EkC+OGgWODEy2hDpWB1PgzH0JNA==,
@@ -4109,6 +4103,7 @@ packages:
             pretty-format: 27.5.1
             slash: 3.0.0
             strip-json-comments: 3.1.1
+            ts-node: 10.5.0_f3bd4037939c2ed2942ba074291f8ef2
         transitivePeerDependencies:
             - bufferutil
             - canvas
@@ -4527,7 +4522,7 @@ packages:
             supports-color: 8.1.1
         dev: true
 
-    /jest/27.5.1:
+    /jest/27.5.1_ts-node@10.5.0:
         resolution:
             {
                 integrity: sha512-Yn0mADZB89zTtjkPJEXwrac3LHudkQMR+Paqa8uxJHCBr9agxztUifWCyiYrjhMPBoUVBjyny0I7XH6ozDr7QQ==,
@@ -4540,9 +4535,9 @@ packages:
             node-notifier:
                 optional: true
         dependencies:
-            '@jest/core': 27.5.1
+            '@jest/core': 27.5.1_ts-node@10.5.0
             import-local: 3.1.0
-            jest-cli: 27.5.1
+            jest-cli: 27.5.1_ts-node@10.5.0
         transitivePeerDependencies:
             - bufferutil
             - canvas
@@ -5219,6 +5214,13 @@ packages:
             for-own: 1.0.0
             make-iterator: 1.0.1
         dev: true
+
+    /ojsama/2.2.0:
+        resolution:
+            {
+                integrity: sha512-kO0IaYP+u1QyMrajfm6m6a0xKNCf7psD/CjEHpLZ7gOx4YRJM6m2fEyNZd187Ocrlb+gOqbITDMyLpvOsqzsCg==,
+            }
+        dev: false
 
     /once/1.4.0:
         resolution: { integrity: sha1-WDsap3WWHUsROsF9nFC6753Xa9E= }
@@ -6598,7 +6600,7 @@ packages:
             '@types/jest': 27.4.0
             bs-logger: 0.2.6
             fast-json-stable-stringify: 2.1.0
-            jest: 27.5.1
+            jest: 27.5.1_ts-node@10.5.0
             jest-util: 27.5.1
             json5: 2.2.0
             lodash.memoize: 4.1.2
@@ -6641,7 +6643,6 @@ packages:
             v8-compile-cache-lib: 3.0.0
             yn: 3.1.1
         dev: true
-        optional: true
 
     /ts-transform-paths/2.0.3:
         resolution:
@@ -6657,7 +6658,7 @@ packages:
             }
         dev: true
 
-    /ttypescript/1.5.13_typescript@4.5.5:
+    /ttypescript/1.5.13_ts-node@10.5.0+typescript@4.5.5:
         resolution:
             {
                 integrity: sha512-KT/RBfGGlVJFqEI8cVvI3nMsmYcFvPSZh8bU0qX+pAwbi7/ABmYkzn7l/K8skw0xmYjVCoyaV6WLsBQxdadybQ==,
@@ -6668,6 +6669,7 @@ packages:
             typescript: '>=3.2.2'
         dependencies:
             resolve: 1.22.0
+            ts-node: 10.5.0_f3bd4037939c2ed2942ba074291f8ef2
             typescript: 4.5.5
         dev: true
 
@@ -6848,7 +6850,6 @@ packages:
                 integrity: sha512-mpSYqfsFvASnSn5qMiwrr4VKfumbPyONLCOPmsR3A6pTY/r0+tSaVbgPWSAIuzbk3lCTa+FForeTiO+wBQGkjA==,
             }
         dev: true
-        optional: true
 
     /v8-to-istanbul/8.1.1:
         resolution:
@@ -7219,4 +7220,3 @@ packages:
             }
         engines: { node: '>=6' }
         dev: true
-        optional: true

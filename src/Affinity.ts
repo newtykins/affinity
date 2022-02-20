@@ -1,51 +1,35 @@
-import axios, { Axios } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import _ from 'lodash';
 import User from '~structures/User';
-import Score, { ScoreSearchTypes } from '~structures/Score';
-import { GameMode, Genre, Language, RankStatus } from '~constants';
+import Score from '~structures/Score';
 import AuthenticationError from '~errors/AuthenticationError';
 import BadRequestError from '~errors/BadRequestError';
-import defaultOptions from '~defaults';
 import Beatmap from '~structures/Beatmap';
 import BeatmapSet from '~structures/BeatmapSet';
+import createAxios from '~functions/createAxios';
+import getApiMode from '~functions/getApiMode';
 
 interface AuthResponse {
 	token: string;
 	expires: number;
 }
 
-const camelCase = (object: object | object[]) => {
-	let newObject = {};
-
-	for (const key in object) {
-		const newKey = _.camelCase(key);
-
-		if (typeof object[key] === 'object' && !Array.isArray(object[key])) {
-			newObject[newKey] = camelCase(object[key]);
-		} else if (Array.isArray(object[key])) {
-			newObject[newKey] = [];
-
-			object[key].forEach((value) => {
-				if (typeof value === 'object') value = camelCase(value);
-				newObject[newKey].push(value);
-			});
-		} else {
-			newObject[newKey] = object[key];
-		}
-	}
-
-	return newObject;
-};
-
-// todo: comments
-// todo: add more filters
+/**
+ * The Affinity client!
+ */
 class Affinity {
 	#clientId: number;
 	#clientSecret: string;
-	#rest: Axios;
-	public loggedIn: boolean = false;
+	#rest: AxiosInstance;
+	#authenticated: boolean = false;
+	#token: string;
+	private config: Affinity.Config;
 
-	constructor(clientId: number, clientSecret: string) {
+	constructor(
+		clientId: number,
+		clientSecret: string,
+		config?: Affinity.Config
+	) {
 		if (!clientId)
 			throw new AuthenticationError(
 				'You must provide an id for the client!'
@@ -57,27 +41,23 @@ class Affinity {
 		this.#clientId = clientId;
 		this.#clientSecret = clientSecret;
 
+		// Set the config
+		this.config = config ?? {};
+		this.config.defaultGamemode ??= 'osu';
+
 		// Create the REST client
-		this.#rest = axios.create({
-			baseURL: 'https://osu.ppy.sh/api/v2/',
-		});
-
-		this.#rest.interceptors.response.use((response) => {
-			if (
-				typeof response.data === 'object' &&
-				!Array.isArray(response.data)
-			) {
-				response.data = camelCase(response.data);
-			} else {
-				response.data = response.data.map((v) => camelCase(v));
-			}
-
-			return response;
-		});
+		this.#rest = createAxios();
 	}
 
 	/**
-	 * Authenticate the client
+	 * Is the client currently logged in?
+	 */
+	public get loggedIn() {
+		return this.#authenticated;
+	}
+
+	/**
+	 * Authenticate with the osu! API
 	 * @private
 	 * @async
 	 */
@@ -98,83 +78,93 @@ class Affinity {
 	/**
 	 * Ensure that the client is logged in before authenticating a request!
 	 * @private
-	 */
-	private loggedInCheck(): boolean {
-		if (this.loggedIn) return true;
-		else {
-			throw new AuthenticationError(
-				'You must be logged in to make use of Affinity!'
-			);
-		}
-	}
-
-	/**
-	 * Log into the API!
 	 * @async
 	 */
-	public async login(): Promise<boolean> {
-		const refresh = async () => {
+	private async isLoggedIn(): Promise<boolean> {
+		// If the client is not logged in, make sure to log in
+		if (!this.#authenticated) {
 			const { token, expires } = await this.authenticate();
 
 			// Update the axios instance's headers
 			this.#rest.defaults.headers['Authorization'] = `Bearer ${token}`;
+			this.#token = token;
 
-			// Refresh the token on expiry
-			setTimeout(async () => await refresh(), expires);
-		};
+			// Mark the client as logged out
+			setTimeout(() => {
+				this.#authenticated = false;
+			}, expires);
 
-		if (!this.loggedIn) {
-			await refresh();
-			this.loggedIn = true;
+			this.#authenticated = true;
 		}
 
-		return this.loggedIn;
+		return this.#authenticated;
 	}
 
 	/**
-	 * Fetch data about a user!
+	 * Update config on the client!
+	 */
+	public updateConfig(config: Partial<Affinity.Config>) {
+		for (const key in config) {
+			this.config[key] = config[key];
+		}
+
+		return this;
+	}
+
+	/**
+	 * Fetch a user by their username or ID!
 	 * @async
 	 */
 	public async getUser(
 		query: string | number,
-		mode: GameMode = GameMode.Standard
+		mode: Affinity.Modes = this.config.defaultGamemode
 	): Promise<User> {
 		const key = typeof query === 'number' ? 'id' : 'username';
 
-		if (this.loggedInCheck()) {
-			const { data } = await this.#rest.get(`users/${query}/${mode}`, {
-				params: {
-					key,
-				},
-			});
+		if (await this.isLoggedIn()) {
+			const { data } = await this.#rest.get(
+				`users/${query}/${getApiMode(mode)}`,
+				{
+					params: {
+						key,
+					},
+				}
+			);
 
-			return new User(this, data);
+			return new User(this, this.#token, mode, data);
 		}
 	}
 
 	/**
-	 * Fetch data about a user's scores by looking them up using their id!
+	 * Fetch a user's scores using their ID!
 	 * @async
 	 */
 	public async getUserScores(
 		id: number,
-		options: Affinity.Options.UserScores = defaultOptions.userScores
+		options: Affinity.Options.UserScores = {
+			type: 'best',
+			mode: this.config.defaultGamemode,
+		}
 	): Promise<Score[]> {
-		if (this.loggedInCheck()) {
-			// Ensure that the id provided is a number
+		if (await this.isLoggedIn()) {
+			// Ensure that the ID provided is a number
 			if (isNaN(id))
 				throw new BadRequestError(
 					'You can only search for scores using an id!'
 				);
 
 			// Make the request
-			const { type, mode, includeFails, limit, offset } = options;
+			const { type, mode, includeFails, limit, offset } = options ?? {
+				type: 'best',
+				mode: this.config.defaultGamemode,
+			};
+
 			const { data }: { data: any[] } = await this.#rest.get(
 				`users/${id}/scores/${type}`,
 				{
 					params: {
 						include_fails: includeFails ? 1 : 0,
-						mode,
+						mode: getApiMode(mode),
 						limit,
 						offset,
 					},
@@ -182,17 +172,17 @@ class Affinity {
 			);
 
 			// Turn the data from the API into Affinity-wrapped scores
-			return data.map((score) => new Score(this, score));
+			return data.map((score) => new Score(this, this.config, score));
 		}
 	}
 
 	/**
-	 * Fetch data about a beatmap by its id!
+	 * Fetch a beatmap by its ID!
 	 * @async
 	 */
 	public async getBeatmap(id: number) {
-		if (this.loggedInCheck()) {
-			// Ensure that the id provided is a number
+		if (await this.isLoggedIn()) {
+			// Ensure that the ID provided is a number
 			if (isNaN(id))
 				throw new BadRequestError(
 					'You can only fetch a beatmap by its id!'
@@ -206,12 +196,12 @@ class Affinity {
 	}
 
 	/**
-	 * Fetch data about a beatmap set by its id!
+	 * Fetch a beatmap set by its ID!
 	 * @async
 	 */
 	public async getBeatmapSet(id: number): Promise<BeatmapSet> {
-		if (this.loggedInCheck()) {
-			// Ensure that the id provided is a number
+		if (await this.isLoggedIn()) {
+			// Ensure that the ID provided is a number
 			if (isNaN(id))
 				throw new BadRequestError(
 					'You can only fetch a beatmapset by its id!'
@@ -220,17 +210,21 @@ class Affinity {
 			// Make the request
 			const { data } = await this.#rest.get(`beatmapsets/${id}`);
 
-			return new BeatmapSet(this, data);
+			return new BeatmapSet(this, this.config, data);
 		}
 	}
 
+	/**
+	 * Search beatmap sets with a query - returns a list of search results
+	 */
 	public async searchBeatmapSets(
 		query: string,
 		options: Affinity.Options.SearchBeatmapSets = {}
 	): Promise<BeatmapSet[]> {
+		// todo: support pagination
 		const { mode, rankedStatus, genre, language, include, nsfw } = options;
 
-		if (this.loggedInCheck()) {
+		if (await this.isLoggedIn()) {
 			// Make the request
 			const {
 				data: { beatmapsets },
@@ -250,27 +244,33 @@ class Affinity {
 			);
 
 			return beatmapsets.map(
-				(beatmapset) => new BeatmapSet(this, beatmapset)
+				(beatmapset) => new BeatmapSet(this, this.config, beatmapset)
 			);
 		}
 	}
 }
 
 namespace Affinity {
+	export type Modes = 'osu' | 'ctb' | 'mania' | 'taiko';
+
+	export interface Config {
+		defaultGamemode?: Modes;
+	}
+
 	export namespace Options {
 		export interface UserScores {
-			type: ScoreSearchTypes;
-			mode: GameMode;
+			type: Score.SearchTypes;
+			mode: Modes;
 			includeFails?: boolean;
 			limit?: number;
 			offset?: number;
 		}
 
 		export interface SearchBeatmapSets {
-			mode?: GameMode;
-			rankedStatus?: Exclude<keyof typeof RankStatus, 'wip' | 'approved'>;
-			genre?: Genre;
-			language?: Language;
+			mode?: Modes;
+			rankedStatus?: Exclude<BeatmapSet.RankStatus, 'wip' | 'approved'>;
+			genre?: BeatmapSet.Genre;
+			language?: BeatmapSet.Language;
 			include?: 'video' | 'storyboard';
 			nsfw?: boolean;
 		}

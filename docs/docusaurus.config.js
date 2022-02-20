@@ -70,6 +70,16 @@ const config = {
 				},
 			],
 		}),
+	plugins: [
+		[
+			'docusaurus-plugin-typedoc',
+			{
+				entryPoints: ['./typedocExports.ts'],
+				tsconfig: '../tsconfig.json',
+				excludePrivate: true,
+			},
+		],
+	],
 };
 
 module.exports = config;
