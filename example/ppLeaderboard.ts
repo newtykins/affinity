@@ -2,10 +2,7 @@ import Affinity from '../dist';
 
 const ppLeaderboard = async (ids: number[]) => {
 	// Setting up the Affinity client
-	const client = new Affinity(
-		10397,
-		'iLFVYjrYsKKnggGQ1xIOptHWxp96LGem0x8WTVrd'
-	);
+	const client = new Affinity(10397, 'your-super-secret-token');
 
 	// Fetch user data
 	let users = await Promise.all(

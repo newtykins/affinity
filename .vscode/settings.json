@@ -10,6 +10,8 @@
 		"**/pnpm-lock.yaml": true,
 		"**/.czrc": true,
 		"**/node_modules": true,
+		"**/.husky": true,
+		"**/.vercel": true,
 		"**/dist": true
 	},
 	"files.associations": {
