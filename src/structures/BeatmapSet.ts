@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import Affinity from '~affinity';
 import links from '~helpers/links';
-import Beatmap from './Beatmap';
+import Beatmap from '~structures/beatmaps/Beatmap';
 
 class BeatmapSet {
 	public rawData: any;

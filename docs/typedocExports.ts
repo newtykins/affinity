@@ -1,14 +1,15 @@
 import Affinity from '~affinity';
 import User from '~structures/User';
 import Score from '~structures/Score';
-import Beatmap from '~structures/Beatmap';
-import BeatmapCompact from '~structures/BeatmapCompact';
+import Beatmap from '~structures/beatmaps/Beatmap';
+import BeatmapCompact from '~structures/beatmaps/BeatmapCompact';
 import BeatmapSet from '~structures/BeatmapSet';
-import BeatmapPlaycount from '~structures/BeatmapPlaycount';
+import BeatmapPlaycount from '~structures/beatmaps/BeatmapPlaycount';
 import links from '~helpers/links';
 import mods from '~helpers/mods';
 import calculateStdPp from '~helpers/calculateStdPp';
 import calculateAccuracy from '~helpers/calculateAccuracy';
+import UserEvent from '~structures/events/Event';
 
 export {
 	Affinity,
@@ -18,6 +19,7 @@ export {
 	BeatmapCompact,
 	BeatmapPlaycount,
 	BeatmapSet,
+	UserEvent,
 	links,
 	mods,
 	calculateStdPp,

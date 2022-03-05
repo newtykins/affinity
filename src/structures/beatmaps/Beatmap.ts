@@ -1,5 +1,5 @@
 import Affinity from '~affinity';
-import BeatmapCompact from './BeatmapCompact';
+import BeatmapCompact from '~structures/beatmaps/BeatmapCompact';
 
 class Beatmap extends BeatmapCompact {
 	public rawData: any;

@@ -4,7 +4,7 @@ import User from '~structures/User';
 import Score from '~structures/Score';
 import AuthenticationError from '~errors/AuthenticationError';
 import BadRequestError from '~errors/BadRequestError';
-import Beatmap from '~structures/Beatmap';
+import Beatmap from '~structures/beatmaps/Beatmap';
 import BeatmapSet from '~structures/BeatmapSet';
 import createAxios from '~functions/createAxios';
 import getApiMode from '~functions/getApiMode';
@@ -131,7 +131,7 @@ class Affinity {
 				}
 			);
 
-			return new User(this, this.#token, mode, data);
+			return new User(this, this.#token, mode, this.config, data);
 		}
 	}
 
@@ -258,12 +258,15 @@ namespace Affinity {
 	}
 
 	export namespace Options {
-		export interface UserScores {
+		export interface Pagination {
+			limit?: number;
+			offset?: number;
+		}
+
+		export interface UserScores extends Pagination {
 			type: Score.SearchTypes;
 			mode: Modes;
 			includeFails?: boolean;
-			limit?: number;
-			offset?: number;
 		}
 
 		export interface SearchBeatmapSets {
@@ -273,6 +276,11 @@ namespace Affinity {
 			language?: BeatmapSet.Language;
 			include?: 'video' | 'storyboard';
 			nsfw?: boolean;
+		}
+
+		export interface RecentActivity {
+			maximum?: number;
+			offset?: number;
 		}
 	}
 }

@@ -17,12 +17,20 @@ describe('The User structure', () => {
 
 	it("can find a user's recent scores", async () => {
 		const [score] = await newt.fetchScores();
+
 		expect(score.userId).toBe(newt.id);
 	});
 
 	it("can fetch a user's favourite beatmaps successfully", async () => {
 		const beatmaps = await newt.fetchBeatmaps();
 		const undercoverMartyn = beatmaps.find((b) => b.id === 1337086);
+
 		expect(undercoverMartyn).toBeInstanceOf(BeatmapSet);
+	});
+
+	it("can fetch a user's recent top ranks", async () => {
+		const topRanks = await newt.fetchRecentActivity('rank');
+
+		expect(topRanks.length > 0 && topRanks[0].rank < 1000).toBeTruthy();
 	});
 });

@@ -2,14 +2,16 @@ import type { AxiosInstance } from 'axios';
 import createAxios from '~functions/createAxios';
 import Affinity from '~affinity';
 import BeatmapSet from './BeatmapSet';
-import BeatmapPlaycount from './BeatmapPlaycount';
+import BeatmapPlaycount from '~structures/beatmaps/BeatmapPlaycount';
 import links from '~helpers/links';
+import UserEvent from './events/Event';
 
 class User {
 	public rawData: any;
 	#client: Affinity;
 	#rest: AxiosInstance;
 	#mode: Affinity.Modes;
+	#config: Affinity.Config;
 
 	public id: number;
 	public username: string;
@@ -36,12 +38,14 @@ class User {
 		client: Affinity,
 		token: string,
 		mode: Affinity.Modes,
+		config: Affinity.Config,
 		data: any
 	) {
 		this.rawData = data;
 		this.#client = client;
 		this.#rest = createAxios(token);
 		this.#mode = mode;
+		this.#config = config;
 
 		const { statistics } = data;
 
@@ -146,8 +150,30 @@ class User {
 			);
 		} else {
 			// @ts-expect-error
-			return data.map((beatmap) => new BeatmapSet(this.#client, beatmap));
+			return data.map(
+				(beatmap) => new BeatmapSet(this.#client, this.#config, beatmap)
+			);
 		}
+	}
+
+	public async fetchRecentActivity<T extends UserEvent.Type>(
+		type: T,
+		options: Affinity.Options.RecentActivity = {}
+	): Promise<UserEvent<T>[]> {
+		const { maximum: limit, offset } = options;
+
+		// Make the request
+		const { data }: { data: UserEvent<T>[] } = await this.#rest.get(
+			`users/${this.id}/recent_activity`,
+			{
+				params: {
+					limit,
+					offset,
+				},
+			}
+		);
+
+		return data.filter((event) => event.type === type);
 	}
 }
 

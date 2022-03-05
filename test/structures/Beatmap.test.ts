@@ -1,5 +1,5 @@
 import Affinity from '~affinity';
-import Beatmap from '~structures/Beatmap';
+import Beatmap from '~structures/beatmaps/Beatmap';
 
 describe('The Beatmap structure', () => {
 	let client: Affinity;

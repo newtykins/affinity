@@ -34,24 +34,28 @@ describe('The Affinity Client', () => {
 	it('uses the default gamemode when making requests', async () => {
 		const scores = await maniaClient.getUserScores(259972);
 		const lastResort = scores.find((score) => score.beatmapId === 1679790);
+
 		expect(lastResort).toBeDefined();
 	});
 
 	it('fails to fetch an osu! user on the mania client when the gamemode is not specified', async () => {
 		const scores = await maniaClient.getUserScores(7562902);
 		const teamMagma = scores.find((score) => score.beatmapId === 2097898);
+
 		expect(teamMagma).toBeUndefined();
 	});
 
 	//* User tests
 	it('finds the correct id for the username "Newt x3"', async () => {
 		const data = await client.getUser(newt.username);
+
 		expect(data.id).toBe(newt.id);
 	});
 
 	//* User Score tests
 	it("can find a user's best scores", async () => {
 		const [score] = await client.getUserScores(newt.id);
+
 		expect(score.userId).toBe(newt.id);
 	});
 
@@ -67,6 +71,7 @@ describe('The Affinity Client', () => {
 	//* Beatmap tests
 	it(`can find the difficulty of the beatmap with the id 2486881`, async () => {
 		const beatmap = await client.getBeatmap(2486881);
+
 		expect(beatmap.difficultyName).toBe('Harmony');
 	});
 
@@ -82,6 +87,7 @@ describe('The Affinity Client', () => {
 
 	it('can search for beatmap sets', async () => {
 		const beatmapsets = await client.searchBeatmapSets('Sunglow');
+
 		expect(beatmapsets.length).toBeGreaterThan(0);
 	});
 });
