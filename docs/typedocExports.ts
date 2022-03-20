@@ -10,6 +10,9 @@ import mods from '~helpers/mods';
 import calculateStdPp from '~helpers/calculateStdPp';
 import calculateAccuracy from '~helpers/calculateAccuracy';
 import UserEvent from '~structures/events/Event';
+import DownloadableScore from '~structures/scores/DownloadableScore';
+import ClientAuth from '~auth/ClientAuth';
+import UserAuth from '~auth/UserAuth';
 
 export {
 	Affinity,
@@ -24,4 +27,7 @@ export {
 	mods,
 	calculateStdPp,
 	calculateAccuracy,
+	DownloadableScore,
+	ClientAuth,
+	UserAuth,
 };

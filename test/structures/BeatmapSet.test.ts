@@ -3,7 +3,7 @@ import Affinity from '~affinity';
 import BeatmapSet from '~structures/BeatmapSet';
 
 describe('The Beatmap Set structure', () => {
-	let client: Affinity;
+	let client: Affinity<ClientAuth>;
 	let sinkIntoTheDeepSeaWorld: BeatmapSet;
 
 	beforeAll(async () => {

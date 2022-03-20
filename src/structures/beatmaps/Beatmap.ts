@@ -2,7 +2,9 @@ import Affinity from '~affinity';
 import AuthStrategy from '~auth/AuthStrategy';
 import BeatmapCompact from '~structures/beatmaps/BeatmapCompact';
 
-class Beatmap extends BeatmapCompact {
+class Beatmap<
+	AuthType extends AuthStrategy = AuthStrategy
+> extends BeatmapCompact<AuthType> {
 	public rawData: any;
 
 	public maxCombo: number;
@@ -18,7 +20,7 @@ class Beatmap extends BeatmapCompact {
 	 */
 	public mapper: string;
 
-	constructor(client: Affinity, auth: AuthStrategy, data: any) {
+	constructor(client: Affinity<AuthType>, auth: AuthStrategy, data: any) {
 		super(client, auth, data);
 		this.rawData = data;
 

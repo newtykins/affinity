@@ -3,27 +3,23 @@ import AuthStrategy, { AuthResponse } from '~auth/AuthStrategy';
 import AuthenticationError from '~errors/AuthenticationError';
 import createAxios from '~functions/createAxios';
 
-export default class ClientAuth implements AuthStrategy {
-	#clientId: number;
-	#clientSecret: string;
+export default class UserAuth implements AuthStrategy {
+	#username: string;
+	#password: string;
 	#authenticated: boolean;
 
 	public token: string;
 	public rest: AxiosInstance;
 
-	constructor(clientId: string | number, clientSecret: string) {
-		if (!clientId)
-			throw new AuthenticationError(
-				'You must provide an id for the client!'
-			);
-		if (isNaN(clientId as any))
-			throw new AuthenticationError('Your client ID must be numeric!');
-		if (!clientSecret)
-			throw new AuthenticationError('You must provide a client secret!');
+	constructor(username: string, password: string) {
+		if (!username)
+			throw new AuthenticationError('You must provide a username!');
+		if (!password)
+			throw new AuthenticationError('You must provide a password!');
 
-		// Store the client credentials
-		this.#clientId = parseInt(clientId as any);
-		this.#clientSecret = clientSecret;
+		// Store the credentials
+		this.#username = username;
+		this.#password = password;
 
 		// Create the REST client
 		this.rest = createAxios();
@@ -39,10 +35,12 @@ export default class ClientAuth implements AuthStrategy {
 		const {
 			data: { access_token, expires_in },
 		} = await axios.post(`https://osu.ppy.sh/oauth/token`, {
-			client_id: this.#clientId,
-			client_secret: this.#clientSecret,
-			grant_type: 'client_credentials',
-			scope: 'public',
+			username: this.#username,
+			password: this.#password,
+			grant_type: 'password',
+			scope: '*',
+			client_id: 5,
+			client_secret: 'FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk',
 		});
 
 		return { token: access_token, expires: expires_in * 1000 };

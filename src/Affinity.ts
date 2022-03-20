@@ -6,16 +6,20 @@ import Beatmap from '~structures/beatmaps/Beatmap';
 import BeatmapSet from '~structures/BeatmapSet';
 import getApiMode from '~functions/getApiMode';
 import AuthStrategy from '~auth/AuthStrategy';
+import AuthenticationError from '~errors/AuthenticationError';
 
 /**
  * The Affinity client!
  */
-class Affinity {
+class Affinity<AuthType extends AuthStrategy = AuthStrategy> {
 	#auth: AuthStrategy;
 	#authenticated: boolean = false;
 	#config: Affinity.Config;
 
-	constructor(auth: AuthStrategy, config?: Affinity.Config) {
+	constructor(auth: AuthType, config?: Affinity.Config) {
+		if (!auth)
+			throw new AuthenticationError('You must provide an auth strategy!');
+
 		this.#auth = auth;
 		this.#config = config ?? {};
 		this.#config.defaultGamemode ??= 'osu';
@@ -50,7 +54,7 @@ class Affinity {
 	public async getUser(
 		query: string | number,
 		mode: Affinity.Modes = this.#config.defaultGamemode
-	): Promise<User> {
+	): Promise<User<AuthType>> {
 		const key = typeof query === 'number' ? 'id' : 'username';
 
 		if (await this.#auth.checkAuthentication()) {
@@ -63,7 +67,7 @@ class Affinity {
 				}
 			);
 
-			return new User(this, this.#auth, mode, data);
+			return new User<AuthType>(this, this.#auth, mode, data);
 		}
 	}
 
@@ -123,7 +127,7 @@ class Affinity {
 			// Make the request
 			const { data } = await this.#auth.rest.get(`beatmaps/${id}`);
 
-			return new Beatmap(this, this.#auth, data);
+			return new Beatmap<AuthType>(this, this.#auth, data);
 		}
 	}
 
