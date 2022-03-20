@@ -6,10 +6,7 @@ describe('The Beatmap Set structure', () => {
 	let sinkIntoTheDeepSeaWorld: BeatmapSet;
 
 	beforeAll(async () => {
-		client = new Affinity(
-			parseInt(process.env.CLIENT_ID),
-			process.env.CLIENT_SECRET
-		);
+		client = new Affinity(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
 
 		sinkIntoTheDeepSeaWorld = await client.getBeatmapSet(779495);
 	});

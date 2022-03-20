@@ -6,10 +6,7 @@ describe('The Beatmap structure', () => {
 	let sunglow: Beatmap;
 
 	beforeAll(async () => {
-		client = new Affinity(
-			parseInt(process.env.CLIENT_ID),
-			process.env.CLIENT_SECRET
-		);
+		client = new Affinity(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
 
 		sunglow = await client.getBeatmap(2486881);
 	});
@@ -22,5 +19,10 @@ describe('The Beatmap structure', () => {
 	it('can fetch the beatmap set that the beatmap belongs to', async () => {
 		const beatmapset = await sunglow.fetchBeatmapSet();
 		expect(beatmapset.id).toBe(1193588);
+	});
+
+	it('can fetch the leaderboards for a beatmap', async () => {
+		const leaderboard = await sunglow.fetchLeaderboard();
+		expect(leaderboard.length).toBe(50);
 	});
 });

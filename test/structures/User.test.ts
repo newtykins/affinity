@@ -7,10 +7,7 @@ describe('The User structure', () => {
 	let newt: User;
 
 	beforeAll(async () => {
-		client = new Affinity(
-			parseInt(process.env.CLIENT_ID),
-			process.env.CLIENT_SECRET
-		);
+		client = new Affinity(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
 
 		newt = await client.getUser(16009610);
 	});

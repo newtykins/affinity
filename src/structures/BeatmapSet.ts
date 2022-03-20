@@ -2,11 +2,12 @@ import _ from 'lodash';
 import Affinity from '~affinity';
 import links from '~helpers/links';
 import Beatmap from '~structures/beatmaps/Beatmap';
+import User from './User';
 
 class BeatmapSet {
 	public rawData: any;
 	#client: Affinity;
-	#config: Affinity.Config;
+	#token: string;
 
 	public id: number;
 	public artist: string;
@@ -32,10 +33,10 @@ class BeatmapSet {
 	public mapper: string;
 	public mapperId: number;
 
-	constructor(client: Affinity, config: Affinity.Config, data: any) {
+	constructor(client: Affinity, token: string, data: any) {
 		this.rawData = data;
 		this.#client = client;
-		this.#config = config;
+		this.#token = token;
 
 		this.id = data?.id;
 		this.artist = data?.artist;
@@ -57,7 +58,7 @@ class BeatmapSet {
 
 		this.beatmaps = data?.beatmaps?.map(
 			({ playcount, passcount, ...beatmap }) => {
-				const b = new Beatmap(this.#client, {
+				const b = new Beatmap(this.#client, this.#token, {
 					playCount: playcount,
 					passCount: passcount,
 					...beatmap,
@@ -87,8 +88,8 @@ class BeatmapSet {
 	 * @async
 	 */
 	public async fetchMapper(
-		mode: Affinity.Modes = this.#config.defaultGamemode
-	) {
+		mode: Affinity.Modes = this.#client.config.defaultGamemode
+	): Promise<User> {
 		return await this.#client.getUser(this.mapperId, mode);
 	}
 }

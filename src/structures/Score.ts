@@ -8,7 +8,6 @@ import links from '~helpers/links';
 class Score {
 	public rawData: any;
 	#client: Affinity;
-	#config: Affinity.Config;
 
 	public id: number;
 	public userId: number;
@@ -27,12 +26,11 @@ class Score {
 	public beatmapId: number;
 	public beatmapSetId: number;
 
-	constructor(client: Affinity, config: Affinity.Config, data: any) {
+	constructor(client: Affinity, data: any) {
 		const { statistics } = data;
 
 		this.rawData = data;
 		this.#client = client;
-		this.#config = config;
 
 		this.id = data?.id;
 		this.userId = data?.userId;
@@ -71,7 +69,7 @@ class Score {
 	 * @async
 	 */
 	public async fetchUser(
-		mode: Affinity.Modes = this.#config.defaultGamemode
+		mode: Affinity.Modes = this.#client.config.defaultGamemode
 	): Promise<User> {
 		return await this.#client.getUser(this.userId, mode);
 	}

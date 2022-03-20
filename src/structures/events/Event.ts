@@ -1,4 +1,4 @@
-import Affinity from '../../../dist';
+import Affinity from '~affinity';
 
 type GameMode = Omit<Affinity.Modes, 'ctb'> | 'fruits';
 

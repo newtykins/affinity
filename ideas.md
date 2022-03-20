@@ -2,3 +2,4 @@
 -   [x] Set default game mode on Client
 -   [x] Allow for config to be updated
 -   [ ] More accurate PP calculator
+-   [ ] Downloadable score

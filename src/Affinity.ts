@@ -23,10 +23,10 @@ class Affinity {
 	#rest: AxiosInstance;
 	#authenticated: boolean = false;
 	#token: string;
-	private config: Affinity.Config;
+	#config: Affinity.Config;
 
 	constructor(
-		clientId: number,
+		clientId: string | number,
 		clientSecret: string,
 		config?: Affinity.Config
 	) {
@@ -34,16 +34,18 @@ class Affinity {
 			throw new AuthenticationError(
 				'You must provide an id for the client!'
 			);
+		if (isNaN(clientId as any))
+			throw new AuthenticationError('Your client ID must be numeric!');
 		if (!clientSecret)
 			throw new AuthenticationError('You must provide a client secret!');
 
 		// Store the client credentials
-		this.#clientId = clientId;
+		this.#clientId = parseInt(clientId as any);
 		this.#clientSecret = clientSecret;
 
 		// Set the config
-		this.config = config ?? {};
-		this.config.defaultGamemode ??= 'osu';
+		this.#config = config ?? {};
+		this.#config.defaultGamemode ??= 'osu';
 
 		// Create the REST client
 		this.#rest = createAxios();
@@ -54,6 +56,10 @@ class Affinity {
 	 */
 	public get loggedIn() {
 		return this.#authenticated;
+	}
+
+	public get config() {
+		return this.#config;
 	}
 
 	/**
@@ -105,7 +111,7 @@ class Affinity {
 	 */
 	public updateConfig(config: Partial<Affinity.Config>) {
 		for (const key in config) {
-			this.config[key] = config[key];
+			this.#config[key] = config[key];
 		}
 
 		return this;
@@ -117,7 +123,7 @@ class Affinity {
 	 */
 	public async getUser(
 		query: string | number,
-		mode: Affinity.Modes = this.config.defaultGamemode
+		mode: Affinity.Modes = this.#config.defaultGamemode
 	): Promise<User> {
 		const key = typeof query === 'number' ? 'id' : 'username';
 
@@ -131,7 +137,7 @@ class Affinity {
 				}
 			);
 
-			return new User(this, this.#token, mode, this.config, data);
+			return new User(this, this.#token, mode, data);
 		}
 	}
 
@@ -143,7 +149,7 @@ class Affinity {
 		id: number,
 		options: Affinity.Options.UserScores = {
 			type: 'best',
-			mode: this.config.defaultGamemode,
+			mode: this.#config.defaultGamemode,
 		}
 	): Promise<Score[]> {
 		if (await this.isLoggedIn()) {
@@ -156,7 +162,7 @@ class Affinity {
 			// Make the request
 			const { type, mode, includeFails, limit, offset } = options ?? {
 				type: 'best',
-				mode: this.config.defaultGamemode,
+				mode: this.#config.defaultGamemode,
 			};
 
 			const { data }: { data: any[] } = await this.#rest.get(
@@ -172,7 +178,7 @@ class Affinity {
 			);
 
 			// Turn the data from the API into Affinity-wrapped scores
-			return data.map((score) => new Score(this, this.config, score));
+			return data.map((score) => new Score(this, score));
 		}
 	}
 
@@ -191,7 +197,7 @@ class Affinity {
 			// Make the request
 			const { data } = await this.#rest.get(`beatmaps/${id}`);
 
-			return new Beatmap(this, data);
+			return new Beatmap(this, this.#token, data);
 		}
 	}
 
@@ -210,7 +216,7 @@ class Affinity {
 			// Make the request
 			const { data } = await this.#rest.get(`beatmapsets/${id}`);
 
-			return new BeatmapSet(this, this.config, data);
+			return new BeatmapSet(this, this.#token, data);
 		}
 	}
 
@@ -244,7 +250,7 @@ class Affinity {
 			);
 
 			return beatmapsets.map(
-				(beatmapset) => new BeatmapSet(this, this.config, beatmapset)
+				(beatmapset) => new BeatmapSet(this, this.#token, beatmapset)
 			);
 		}
 	}

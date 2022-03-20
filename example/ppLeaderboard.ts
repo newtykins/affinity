@@ -1,4 +1,4 @@
-import Affinity from '../dist';
+import Affinity from '~affinity';
 
 const ppLeaderboard = async (ids: number[]) => {
 	// Setting up the Affinity client

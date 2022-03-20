@@ -11,7 +11,7 @@ class User {
 	#client: Affinity;
 	#rest: AxiosInstance;
 	#mode: Affinity.Modes;
-	#config: Affinity.Config;
+	#token: string;
 
 	public id: number;
 	public username: string;
@@ -38,14 +38,13 @@ class User {
 		client: Affinity,
 		token: string,
 		mode: Affinity.Modes,
-		config: Affinity.Config,
 		data: any
 	) {
 		this.rawData = data;
 		this.#client = client;
 		this.#rest = createAxios(token);
 		this.#mode = mode;
-		this.#config = config;
+		this.#token = token;
 
 		const { statistics } = data;
 
@@ -146,12 +145,13 @@ class User {
 		if (type === 'most_played') {
 			// @ts-expect-error
 			return data.map(
-				(beatmap) => new BeatmapPlaycount(this.#client, beatmap)
+				(beatmap) =>
+					new BeatmapPlaycount(this.#client, this.#token, beatmap)
 			);
 		} else {
 			// @ts-expect-error
 			return data.map(
-				(beatmap) => new BeatmapSet(this.#client, this.#config, beatmap)
+				(beatmap) => new BeatmapSet(this.#client, this.#token, beatmap)
 			);
 		}
 	}

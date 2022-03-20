@@ -17,8 +17,8 @@ class Beatmap extends BeatmapCompact {
 	 */
 	public mapper: string;
 
-	constructor(client: Affinity, data: any) {
-		super(client, data);
+	constructor(client: Affinity, token: string, data: any) {
+		super(client, token, data);
 		this.rawData = data;
 
 		this.maxCombo = data?.maxCombo;

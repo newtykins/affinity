@@ -3,7 +3,7 @@ import AuthenticationError from '~errors/AuthenticationError';
 import BadRequestError from '~errors/BadRequestError';
 import User from '~structures/User';
 
-const clientId = parseInt(process.env.CLIENT_ID);
+const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
 
 describe('The Affinity Client', () => {

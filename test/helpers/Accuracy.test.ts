@@ -15,10 +15,7 @@ describe('The accuracy calculation helper', () => {
 	let syaron: User;
 
 	beforeAll(async () => {
-		client = new Affinity(
-			parseInt(process.env.CLIENT_ID),
-			process.env.CLIENT_SECRET
-		);
+		client = new Affinity(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
 
 		shigetora = await client.getUser(124493);
 		jakads = await client.getUser(259972, 'mania');

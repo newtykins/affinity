@@ -1,4 +1,4 @@
-import Affinity from './Affinity';
+import Affinity from '~affinity';
 import mods from '~helpers/mods';
 import links from '~helpers/links';
 import calculateAccuracy from '~helpers/calculateAccuracy';

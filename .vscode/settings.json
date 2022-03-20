@@ -11,8 +11,7 @@
 		"**/.czrc": true,
 		"**/node_modules": true,
 		"**/.husky": true,
-		"**/.vercel": true,
-		"**/dist": true
+		"**/.vercel": true
 	},
 	"files.associations": {
 		".czrc": "json"
