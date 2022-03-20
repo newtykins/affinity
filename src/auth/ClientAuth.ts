@@ -3,11 +3,14 @@ import AuthStrategy, { AuthResponse } from '~auth/AuthStrategy';
 import AuthenticationError from '~errors/AuthenticationError';
 import createAxios from '~functions/createAxios';
 
+/**
+ * An authentication strategy that signs in with the details of an OAuth client
+ */
 export default class ClientAuth implements AuthStrategy {
 	#clientId: number;
 	#clientSecret: string;
-	#authenticated: boolean;
 
+	public authenticated: boolean;
 	public token: string;
 	public rest: AxiosInstance;
 
@@ -54,19 +57,19 @@ export default class ClientAuth implements AuthStrategy {
 	 */
 	async checkAuthentication(): Promise<boolean> {
 		// If the client is not logged in, make sure to log in
-		if (!this.#authenticated) {
+		if (!this.authenticated) {
 			const { token, expires } = await this.authenticate();
 
 			// Mark the client as logged out
 			setTimeout(() => {
-				this.#authenticated = false;
+				this.authenticated = false;
 			}, expires);
 
-			this.#authenticated = true;
+			this.authenticated = true;
 			this.token = token;
 			this.rest.defaults.headers['Authorization'] = `Bearer ${token}`;
 		}
 
-		return this.#authenticated;
+		return this.authenticated;
 	}
 }

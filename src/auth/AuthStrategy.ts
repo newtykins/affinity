@@ -3,6 +3,7 @@ import { AxiosInstance } from 'axios';
 interface AuthStrategy {
 	token: string;
 	rest: AxiosInstance;
+	authenticated: boolean;
 
 	checkAuthentication(): Promise<boolean>;
 }

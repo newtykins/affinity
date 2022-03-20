@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import camelCase from 'lodash.camelcase';
 import Affinity from '~affinity';
 import AuthStrategy from '~auth/AuthStrategy';
 import links from '~helpers/links';
@@ -75,7 +75,7 @@ class BeatmapSet {
 		this.covers = Object.keys(data?.covers).length > 0 ? {} : null;
 
 		Object.keys(data?.covers).forEach((key) => {
-			this.covers[_.camelCase(key).replace('X', 'x').replace('@', '')] =
+			this.covers[camelCase(key).replace('X', 'x').replace('@', '')] =
 				data?.covers[key];
 		});
 	}

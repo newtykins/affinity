@@ -134,53 +134,60 @@ class User<AuthType extends AuthStrategy = AuthStrategy> {
 	): Promise<
 		T extends 'most_played' ? BeatmapPlaycount<AuthType>[] : BeatmapSet[]
 	> {
-		// @ts-expect-error - ensure there is a type
-		type = type ?? 'favourite';
-		const { limit, offset } = options;
+		if (await this.#auth.checkAuthentication()) {
+			// @ts-expect-error - ensure there is a type
+			type = type ?? 'favourite';
+			const { limit, offset } = options;
 
-		// Make the request
-		const { data }: { data: any[] } = await this.#auth.rest.get(
-			`users/${this.id}/beatmapsets/${type}`,
-			{
-				params: {
-					limit,
-					offset,
-				},
+			// Make the request
+			const { data }: { data: any[] } = await this.#auth.rest.get(
+				`users/${this.id}/beatmapsets/${type}`,
+				{
+					params: {
+						limit,
+						offset,
+					},
+				}
+			);
+
+			if (type === 'most_played') {
+				// @ts-expect-error
+				return data.map(
+					(beatmap) =>
+						new BeatmapPlaycount(this.#client, this.#auth, beatmap)
+				);
+			} else {
+				// @ts-expect-error
+				return data.map(
+					(beatmap) =>
+						new BeatmapSet(this.#client, this.#auth, beatmap)
+				);
 			}
-		);
-
-		if (type === 'most_played') {
-			// @ts-expect-error
-			return data.map(
-				(beatmap) =>
-					new BeatmapPlaycount(this.#client, this.#auth, beatmap)
-			);
-		} else {
-			// @ts-expect-error
-			return data.map(
-				(beatmap) => new BeatmapSet(this.#client, this.#auth, beatmap)
-			);
 		}
 	}
 
+	/**
+	 * Fetch a user's recent activity. Returns a list of events.
+	 * @async
+	 */
 	public async fetchRecentActivity<T extends UserEvent.Type>(
 		type: T,
 		options: Affinity.Options.RecentActivity = {}
 	): Promise<UserEvent<T>[]> {
-		const { maximum: limit, offset } = options;
+		if (await this.#auth.checkAuthentication()) {
+			const { maximum: limit, offset } = options;
 
-		// Make the request
-		const { data }: { data: UserEvent<T>[] } = await this.#auth.rest.get(
-			`users/${this.id}/recent_activity`,
-			{
-				params: {
-					limit,
-					offset,
-				},
-			}
-		);
+			// Make the request
+			const { data }: { data: UserEvent<T>[] } =
+				await this.#auth.rest.get(`users/${this.id}/recent_activity`, {
+					params: {
+						limit,
+						offset,
+					},
+				});
 
-		return data.filter((event) => event.type === type);
+			return data.filter((event) => event.type === type);
+		}
 	}
 }
 

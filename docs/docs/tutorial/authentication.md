@@ -8,9 +8,11 @@ Authenticating Affinity is simple! First you must create an OAuth client on your
 Now that we have gotten our client registered, we can start coding!
 
 ```ts title="/src/index.ts"
-import Affinity from 'affinity-osu';
+import Affinity, { ClientAuth } from 'affinity-osu';
 
-const client = new Affinity(1234, 'your-super-secret-client-secret');
+const client = new Affinity(
+	new ClientAuth(1234, 'your-super-secret-client-secret')
+);
 // highlight-start
 console.log(client.loggedIn); // false
 // highlight-end

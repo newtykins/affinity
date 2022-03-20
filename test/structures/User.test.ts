@@ -17,7 +17,6 @@ describe('The User structure', () => {
 
 	it("can find a user's recent scores", async () => {
 		const [score] = await newt.fetchScores();
-
 		expect(score.userId).toBe(newt.id);
 	});
 
@@ -30,7 +29,6 @@ describe('The User structure', () => {
 
 	it("can fetch a user's recent top ranks", async () => {
 		const topRanks = await newt.fetchRecentActivity('rank');
-
 		expect(topRanks.length > 0 && topRanks[0].rank < 1000).toBeTruthy();
 	});
 });

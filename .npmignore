@@ -10,3 +10,4 @@ tsconfig.json
 .env.example
 .env
 .vscode
+replays

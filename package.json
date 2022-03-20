@@ -1,7 +1,7 @@
 {
 	"name": "affinity-osu",
 	"version": "1.0.0",
-	"description": "",
+	"description": "The simplest osu! toolkit around (:",
 	"main": "dist/index.js",
 	"scripts": {
 		"commit": "cz",
@@ -15,14 +15,15 @@
 		"docs:start": "cd ./docs && pnpm start",
 		"docs:build": "cd ./docs && pnpm build",
 		"docs:serve": "cd ./docs && pnpm serve",
-		"prepare": "npx only-allow pnpm && pnpm docs:deps"
+		"prepare": "npx only-allow pnpm && pnpm docs:deps",
+		"phobia": "bundle-phobia -p package.json"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
 		"axios": "^0.26.0",
-		"lodash": "^4.17.21",
+		"lodash.camelcase": "^4.3.0",
 		"ojsama": "^2.2.0"
 	},
 	"devDependencies": {
@@ -30,11 +31,14 @@
 		"@types/gulp-uglify": "^3.0.7",
 		"@types/inquirer": "^8.2.0",
 		"@types/jest": "^27.4.0",
-		"@types/lodash": "^4.14.178",
+		"@types/lodash.camelcase": "^4.3.6",
 		"@types/node": "^17.0.18",
+		"bundle-phobia-cli": "^0.14.13",
 		"commitizen": "^4.2.4",
 		"cz-conventional-changelog": "^3.3.0",
 		"dotenv": "^16.0.0",
+		"dts-minify": "^0.3.0",
+		"glob": "^7.2.0",
 		"gulp": "^4.0.2",
 		"gulp-cli": "^2.3.0",
 		"gulp-typescript": "^6.0.0-alpha.1",

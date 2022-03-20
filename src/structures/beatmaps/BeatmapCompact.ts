@@ -58,25 +58,29 @@ class BeatmapCompact<AuthType extends AuthStrategy = AuthStrategy> {
 	// todo: allow mod input
 	/**
 	 * Fetch the top 50 scores on the beatmap!
+	 * @async
 	 */
 	public async fetchLeaderboard(): Promise<
 		AuthType extends UserAuth ? DownloadableScore[] : Score[]
 	> {
-		const {
-			data: { scores },
-		}: { data: { scores: any[] } } = await this.#auth.rest.get(
-			`beatmaps/${this.id}/scores`,
-			{
-				params: {
-					type: 'global',
-					mode: this.mode,
-				},
-			}
-		);
+		if (await this.#auth.authenticated) {
+			const {
+				data: { scores },
+			}: { data: { scores: any[] } } = await this.#auth.rest.get(
+				`beatmaps/${this.id}/scores`,
+				{
+					params: {
+						type: 'global',
+						mode: this.mode,
+					},
+				}
+			);
 
-		return scores.map(
-			(score) => new DownloadableScore(this.#client, this.#auth, score)
-		);
+			return scores.map(
+				(score) =>
+					new DownloadableScore(this.#client, this.#auth, score)
+			);
+		}
 	}
 }
 

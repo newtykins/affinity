@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import User from '~structures/User';
 import Score from '~structures/scores/Score';
 import BadRequestError from '~errors/BadRequestError';
@@ -7,14 +6,27 @@ import BeatmapSet from '~structures/BeatmapSet';
 import getApiMode from '~functions/getApiMode';
 import AuthStrategy from '~auth/AuthStrategy';
 import AuthenticationError from '~errors/AuthenticationError';
+import ClientAuth from '~auth/ClientAuth';
+import UserAuth from '~auth/UserAuth';
 
 /**
  * The Affinity client!
  */
 class Affinity<AuthType extends AuthStrategy = AuthStrategy> {
 	#auth: AuthStrategy;
-	#authenticated: boolean = false;
 	#config: Affinity.Config;
+
+	/**
+	 * An authentication strategy that signs in with the details of an OAuth client
+	 * @static
+	 */
+	static ClientAuth = ClientAuth;
+
+	/**
+	 * An authentication strategy that signs in with the username and password of an osu! account
+	 * @static
+	 */
+	static UserAuth = UserAuth;
 
 	constructor(auth: AuthType, config?: Affinity.Config) {
 		if (!auth)
@@ -29,22 +41,20 @@ class Affinity<AuthType extends AuthStrategy = AuthStrategy> {
 	 * Is the client currently logged in?
 	 */
 	public get loggedIn() {
-		return this.#authenticated;
+		return this.#auth.authenticated;
 	}
 
+	/**
+	 * The current config of the Affinity client
+	 */
 	public get config() {
 		return this.#config;
 	}
 
-	/**
-	 * Update config on the client!
-	 */
-	public updateConfig(config: Partial<Affinity.Config>) {
+	public set config(config: Partial<Affinity.Config>) {
 		for (const key in config) {
 			this.#config[key] = config[key];
 		}
-
-		return this;
 	}
 
 	/**
@@ -55,9 +65,9 @@ class Affinity<AuthType extends AuthStrategy = AuthStrategy> {
 		query: string | number,
 		mode: Affinity.Modes = this.#config.defaultGamemode
 	): Promise<User<AuthType>> {
-		const key = typeof query === 'number' ? 'id' : 'username';
-
 		if (await this.#auth.checkAuthentication()) {
+			const key = isNaN(query as any) ? 'username' : 'id';
+
 			const { data } = await this.#auth.rest.get(
 				`users/${query}/${getApiMode(mode)}`,
 				{
@@ -72,7 +82,7 @@ class Affinity<AuthType extends AuthStrategy = AuthStrategy> {
 	}
 
 	/**
-	 * Fetch a user's scores using their ID!
+	 * Fetch a user's scores by their ID!
 	 * @async
 	 */
 	public async getUserScores(
@@ -151,7 +161,8 @@ class Affinity<AuthType extends AuthStrategy = AuthStrategy> {
 	}
 
 	/**
-	 * Search beatmap sets with a query - returns a list of search results
+	 * Search beatmap sets with a query!
+	 * @async
 	 */
 	public async searchBeatmapSets(
 		query: string,

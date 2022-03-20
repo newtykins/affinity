@@ -1,5 +1,5 @@
 import axios from 'axios';
-import _ from 'lodash';
+import camelCase from 'lodash.camelcase';
 
 export default function createAxios(token?: string) {
 	const client = axios.create({
@@ -11,9 +11,9 @@ export default function createAxios(token?: string) {
 			typeof response.data === 'object' &&
 			!Array.isArray(response.data)
 		) {
-			response.data = camelCase(response.data);
+			response.data = camelCaseObject(response.data);
 		} else {
-			response.data = response.data.map((v) => camelCase(v));
+			response.data = response.data.map((v) => camelCaseObject(v));
 		}
 
 		return response;
@@ -26,19 +26,19 @@ export default function createAxios(token?: string) {
 	return client;
 }
 
-const camelCase = (object: object | object[]) => {
+const camelCaseObject = (object: object | object[]) => {
 	let newObject = {};
 
 	for (const key in object) {
-		const newKey = _.camelCase(key);
+		const newKey = camelCase(key);
 
 		if (typeof object[key] === 'object' && !Array.isArray(object[key])) {
-			newObject[newKey] = camelCase(object[key]);
+			newObject[newKey] = camelCaseObject(object[key]);
 		} else if (Array.isArray(object[key])) {
 			newObject[newKey] = [];
 
 			object[key].forEach((value) => {
-				if (typeof value === 'object') value = camelCase(value);
+				if (typeof value === 'object') value = camelCaseObject(value);
 				newObject[newKey].push(value);
 			});
 		} else {
