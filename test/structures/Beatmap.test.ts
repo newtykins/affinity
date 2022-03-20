@@ -1,21 +1,30 @@
-import ClientAuth from '~auth/ClientAuth';
 import path from 'path';
 import Affinity from '~affinity';
 import Beatmap from '~structures/beatmaps/Beatmap';
-import Score from '~structures/scores/Score';
+import DownloadableScore from '~structures/scores/DownloadableScore';
+import UserAuth from '~auth/UserAuth';
+import fs from 'fs';
+
+const replaysDir = path.join(__dirname, '..', 'replays');
 
 describe('The Beatmap structure', () => {
-	let client: Affinity;
-	let sunglow: Beatmap;
-	let leaderboard: Score[];
+	let client: Affinity<UserAuth>;
+	let sunglow: Beatmap<UserAuth>;
+	let leaderboard: DownloadableScore[];
 
 	beforeAll(async () => {
+		fs.mkdirSync(replaysDir);
+
 		client = new Affinity(
-			new ClientAuth(process.env.CLIENT_ID, process.env.CLIENT_SECRET)
+			new UserAuth(process.env.USERNAME, process.env.PASSWORD)
 		);
 
 		sunglow = await client.getBeatmap(2486881);
 		leaderboard = await sunglow.fetchLeaderboard();
+	});
+
+	afterAll(() => {
+		fs.rmSync(replaysDir, { recursive: true, force: true });
 	});
 
 	it('fetches the profile of the mapper when fetchMapper is called', async () => {
@@ -32,19 +41,14 @@ describe('The Beatmap structure', () => {
 		expect(leaderboard.length).toBe(50);
 	});
 
-	// it('can download a replay from the leaderboard', async () => {
-	// 	const score =
-	// 		leaderboard[Math.floor(Math.random() * leaderboard.length)];
+	it('can download a replay from the leaderboard', async () => {
+		const score =
+			leaderboard[Math.floor(Math.random() * leaderboard.length)];
+		const { username } = await score.fetchUser();
+		const filePath = path.join(replaysDir, `${username}.osr`);
 
-	// 	score
-	// 		.downloadReplay(
-	// 			path.join(
-	// 				__dirname,
-	// 				'..',
-	// 				'replays',
-	// 				(await score.fetchUser()).username
-	// 			)
-	// 		)
-	// 		.then(() => expect(true).toBeTruthy());
-	// });
+		score.downloadReplay(filePath).then(() => {
+			expect(fs.existsSync(filePath)).toBeTruthy();
+		});
+	});
 });

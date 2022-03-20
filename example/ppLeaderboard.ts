@@ -1,9 +1,11 @@
-import Affinity from '~affinity';
+import Affinity, { ClientAuth } from '../dist';
+
+// Setting up the Affinity client
+const client = new Affinity(
+	new ClientAuth('your-client-id', 'your-super-secret-password')
+);
 
 const ppLeaderboard = async (ids: number[]) => {
-	// Setting up the Affinity client
-	const client = new Affinity(10397, 'your-super-secret-token');
-
 	// Fetch user data
 	let users = await Promise.all(
 		ids.map(async (id) => await client.getUser(id))

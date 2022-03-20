@@ -4,8 +4,8 @@ import Score from '~structures/scores/Score';
 import User from '~structures/User';
 
 describe('The Score structure', () => {
-	let client: Affinity;
-	let toy: User;
+	let client: Affinity<ClientAuth>;
+	let toy: User<ClientAuth>;
 	let sidetrackedDay: Score;
 
 	beforeAll(async () => {

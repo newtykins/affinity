@@ -4,10 +4,12 @@ import User from '~structures/User';
 import parseMode from '~functions/parseMode';
 import links from '~helpers/links';
 import AuthStrategy from '~auth/AuthStrategy';
-import { Score } from '../../../docs/typedocExports';
+import DownloadableScore from '~structures/scores/DownloadableScore';
+import UserAuth from '~auth/UserAuth';
+import Score from '~structures/scores/Score';
 
-class BeatmapCompact {
-	#client: Affinity;
+class BeatmapCompact<AuthType extends AuthStrategy = AuthStrategy> {
+	#client: Affinity<AuthType>;
 	#auth: AuthStrategy;
 
 	public id: number;
@@ -19,7 +21,7 @@ class BeatmapCompact {
 	public mapperId: number;
 	public difficultyName: string;
 
-	constructor(client: Affinity, auth: AuthStrategy, data: any) {
+	constructor(client: Affinity<AuthType>, auth: AuthStrategy, data: any) {
 		this.#client = client;
 		this.#auth = auth;
 
@@ -57,7 +59,9 @@ class BeatmapCompact {
 	/**
 	 * Fetch the top 50 scores on the beatmap!
 	 */
-	public async fetchLeaderboard(): Promise<Score[]> {
+	public async fetchLeaderboard(): Promise<
+		AuthType extends UserAuth ? DownloadableScore[] : Score[]
+	> {
 		const {
 			data: { scores },
 		}: { data: { scores: any[] } } = await this.#auth.rest.get(
@@ -70,7 +74,9 @@ class BeatmapCompact {
 			}
 		);
 
-		return scores.map((score) => new Score(this.#client, score));
+		return scores.map(
+			(score) => new DownloadableScore(this.#client, this.#auth, score)
+		);
 	}
 }
 

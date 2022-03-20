@@ -4,8 +4,8 @@ import BeatmapSet from '~structures/BeatmapSet';
 import User from '~structures/User';
 
 describe('The User structure', () => {
-	let client: Affinity;
-	let newt: User;
+	let client: Affinity<ClientAuth>;
+	let newt: User<ClientAuth>;
 
 	beforeAll(async () => {
 		client = new Affinity(

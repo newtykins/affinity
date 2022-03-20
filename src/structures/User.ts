@@ -5,7 +5,7 @@ import links from '~helpers/links';
 import UserEvent from './events/Event';
 import AuthStrategy from '~auth/AuthStrategy';
 
-class User {
+class User<AuthType extends AuthStrategy = AuthStrategy> {
 	public rawData: any;
 	#client: Affinity;
 	#mode: Affinity.Modes;
@@ -131,7 +131,9 @@ class User {
 	public async fetchBeatmaps<T extends User.BeatmapTypes = 'favourite'>(
 		type?: T,
 		options?: Affinity.Options.Pagination
-	): Promise<T extends 'most_played' ? BeatmapPlaycount[] : BeatmapSet[]> {
+	): Promise<
+		T extends 'most_played' ? BeatmapPlaycount<AuthType>[] : BeatmapSet[]
+	> {
 		// @ts-expect-error - ensure there is a type
 		type = type ?? 'favourite';
 		const { limit, offset } = options;
