@@ -1,6 +1,6 @@
 import ojsama from 'ojsama';
 import axios from 'axios';
-import Score from '~structures/Score';
+import Score from '~structures/scores/Score';
 import calculateAccuracy from './calculateAccuracy';
 import modsHelper, { ModCombos } from './mods';
 

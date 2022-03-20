@@ -1,3 +1,4 @@
+import ClientAuth from '~auth/ClientAuth';
 import Affinity from '~affinity';
 import BeatmapSet from '~structures/BeatmapSet';
 import User from '~structures/User';
@@ -7,7 +8,9 @@ describe('The User structure', () => {
 	let newt: User;
 
 	beforeAll(async () => {
-		client = new Affinity(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
+		client = new Affinity(
+			new ClientAuth(process.env.CLIENT_ID, process.env.CLIENT_SECRET)
+		);
 
 		newt = await client.getUser(16009610);
 	});
@@ -19,7 +22,7 @@ describe('The User structure', () => {
 	});
 
 	it("can fetch a user's favourite beatmaps successfully", async () => {
-		const beatmaps = await newt.fetchBeatmaps();
+		const beatmaps = await newt.fetchBeatmaps('favourite', { limit: 100 });
 		const undercoverMartyn = beatmaps.find((b) => b.id === 1337086);
 
 		expect(undercoverMartyn).toBeInstanceOf(BeatmapSet);

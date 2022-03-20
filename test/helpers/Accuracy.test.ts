@@ -1,3 +1,4 @@
+import ClientAuth from '~auth/ClientAuth';
 import Affinity from '~affinity';
 import calculateAccuracy from '~helpers/calculateAccuracy';
 import User from '~structures/User';
@@ -15,7 +16,9 @@ describe('The accuracy calculation helper', () => {
 	let syaron: User;
 
 	beforeAll(async () => {
-		client = new Affinity(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
+		client = new Affinity(
+			new ClientAuth(process.env.CLIENT_ID, process.env.CLIENT_SECRET)
+		);
 
 		shigetora = await client.getUser(124493);
 		jakads = await client.getUser(259972, 'mania');

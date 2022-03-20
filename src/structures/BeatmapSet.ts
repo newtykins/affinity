@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import Affinity from '~affinity';
+import AuthStrategy from '~auth/AuthStrategy';
 import links from '~helpers/links';
 import Beatmap from '~structures/beatmaps/Beatmap';
 import User from './User';
@@ -7,7 +8,7 @@ import User from './User';
 class BeatmapSet {
 	public rawData: any;
 	#client: Affinity;
-	#token: string;
+	#auth: AuthStrategy;
 
 	public id: number;
 	public artist: string;
@@ -33,10 +34,10 @@ class BeatmapSet {
 	public mapper: string;
 	public mapperId: number;
 
-	constructor(client: Affinity, token: string, data: any) {
+	constructor(client: Affinity, auth: AuthStrategy, data: any) {
 		this.rawData = data;
 		this.#client = client;
-		this.#token = token;
+		this.#auth = auth;
 
 		this.id = data?.id;
 		this.artist = data?.artist;
@@ -58,7 +59,7 @@ class BeatmapSet {
 
 		this.beatmaps = data?.beatmaps?.map(
 			({ playcount, passcount, ...beatmap }) => {
-				const b = new Beatmap(this.#client, this.#token, {
+				const b = new Beatmap(this.#client, this.#auth, {
 					playCount: playcount,
 					passCount: passcount,
 					...beatmap,

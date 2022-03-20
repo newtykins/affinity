@@ -1,5 +1,6 @@
+import ClientAuth from '~auth/ClientAuth';
 import Affinity from '~affinity';
-import Score from '~structures/Score';
+import Score from '~structures/scores/Score';
 import User from '~structures/User';
 
 describe('The Score structure', () => {
@@ -8,7 +9,9 @@ describe('The Score structure', () => {
 	let sidetrackedDay: Score;
 
 	beforeAll(async () => {
-		client = new Affinity(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
+		client = new Affinity(
+			new ClientAuth(process.env.CLIENT_ID, process.env.CLIENT_SECRET)
+		);
 
 		toy = await client.getUser(2757689);
 

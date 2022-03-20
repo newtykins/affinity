@@ -1,54 +1,24 @@
-import axios, { AxiosInstance } from 'axios';
 import _ from 'lodash';
 import User from '~structures/User';
-import Score from '~structures/Score';
-import AuthenticationError from '~errors/AuthenticationError';
+import Score from '~structures/scores/Score';
 import BadRequestError from '~errors/BadRequestError';
 import Beatmap from '~structures/beatmaps/Beatmap';
 import BeatmapSet from '~structures/BeatmapSet';
-import createAxios from '~functions/createAxios';
 import getApiMode from '~functions/getApiMode';
-
-interface AuthResponse {
-	token: string;
-	expires: number;
-}
+import AuthStrategy from '~auth/AuthStrategy';
 
 /**
  * The Affinity client!
  */
 class Affinity {
-	#clientId: number;
-	#clientSecret: string;
-	#rest: AxiosInstance;
+	#auth: AuthStrategy;
 	#authenticated: boolean = false;
-	#token: string;
 	#config: Affinity.Config;
 
-	constructor(
-		clientId: string | number,
-		clientSecret: string,
-		config?: Affinity.Config
-	) {
-		if (!clientId)
-			throw new AuthenticationError(
-				'You must provide an id for the client!'
-			);
-		if (isNaN(clientId as any))
-			throw new AuthenticationError('Your client ID must be numeric!');
-		if (!clientSecret)
-			throw new AuthenticationError('You must provide a client secret!');
-
-		// Store the client credentials
-		this.#clientId = parseInt(clientId as any);
-		this.#clientSecret = clientSecret;
-
-		// Set the config
+	constructor(auth: AuthStrategy, config?: Affinity.Config) {
+		this.#auth = auth;
 		this.#config = config ?? {};
 		this.#config.defaultGamemode ??= 'osu';
-
-		// Create the REST client
-		this.#rest = createAxios();
 	}
 
 	/**
@@ -60,50 +30,6 @@ class Affinity {
 
 	public get config() {
 		return this.#config;
-	}
-
-	/**
-	 * Authenticate with the osu! API
-	 * @private
-	 * @async
-	 */
-	private async authenticate(): Promise<AuthResponse> {
-		// Fetch the user's access token
-		const {
-			data: { access_token, expires_in },
-		} = await axios.post(`https://osu.ppy.sh/oauth/token`, {
-			client_id: this.#clientId,
-			client_secret: this.#clientSecret,
-			grant_type: 'client_credentials',
-			scope: 'public',
-		});
-
-		return { token: access_token, expires: expires_in * 1000 };
-	}
-
-	/**
-	 * Ensure that the client is logged in before authenticating a request!
-	 * @private
-	 * @async
-	 */
-	private async isLoggedIn(): Promise<boolean> {
-		// If the client is not logged in, make sure to log in
-		if (!this.#authenticated) {
-			const { token, expires } = await this.authenticate();
-
-			// Update the axios instance's headers
-			this.#rest.defaults.headers['Authorization'] = `Bearer ${token}`;
-			this.#token = token;
-
-			// Mark the client as logged out
-			setTimeout(() => {
-				this.#authenticated = false;
-			}, expires);
-
-			this.#authenticated = true;
-		}
-
-		return this.#authenticated;
 	}
 
 	/**
@@ -127,8 +53,8 @@ class Affinity {
 	): Promise<User> {
 		const key = typeof query === 'number' ? 'id' : 'username';
 
-		if (await this.isLoggedIn()) {
-			const { data } = await this.#rest.get(
+		if (await this.#auth.checkAuthentication()) {
+			const { data } = await this.#auth.rest.get(
 				`users/${query}/${getApiMode(mode)}`,
 				{
 					params: {
@@ -137,7 +63,7 @@ class Affinity {
 				}
 			);
 
-			return new User(this, this.#token, mode, data);
+			return new User(this, this.#auth, mode, data);
 		}
 	}
 
@@ -152,7 +78,7 @@ class Affinity {
 			mode: this.#config.defaultGamemode,
 		}
 	): Promise<Score[]> {
-		if (await this.isLoggedIn()) {
+		if (await this.#auth.checkAuthentication()) {
 			// Ensure that the ID provided is a number
 			if (isNaN(id))
 				throw new BadRequestError(
@@ -165,7 +91,7 @@ class Affinity {
 				mode: this.#config.defaultGamemode,
 			};
 
-			const { data }: { data: any[] } = await this.#rest.get(
+			const { data }: { data: any[] } = await this.#auth.rest.get(
 				`users/${id}/scores/${type}`,
 				{
 					params: {
@@ -187,7 +113,7 @@ class Affinity {
 	 * @async
 	 */
 	public async getBeatmap(id: number) {
-		if (await this.isLoggedIn()) {
+		if (await this.#auth.checkAuthentication()) {
 			// Ensure that the ID provided is a number
 			if (isNaN(id))
 				throw new BadRequestError(
@@ -195,9 +121,9 @@ class Affinity {
 				);
 
 			// Make the request
-			const { data } = await this.#rest.get(`beatmaps/${id}`);
+			const { data } = await this.#auth.rest.get(`beatmaps/${id}`);
 
-			return new Beatmap(this, this.#token, data);
+			return new Beatmap(this, this.#auth, data);
 		}
 	}
 
@@ -206,7 +132,7 @@ class Affinity {
 	 * @async
 	 */
 	public async getBeatmapSet(id: number): Promise<BeatmapSet> {
-		if (await this.isLoggedIn()) {
+		if (await this.#auth.checkAuthentication()) {
 			// Ensure that the ID provided is a number
 			if (isNaN(id))
 				throw new BadRequestError(
@@ -214,9 +140,9 @@ class Affinity {
 				);
 
 			// Make the request
-			const { data } = await this.#rest.get(`beatmapsets/${id}`);
+			const { data } = await this.#auth.rest.get(`beatmapsets/${id}`);
 
-			return new BeatmapSet(this, this.#token, data);
+			return new BeatmapSet(this, this.#auth, data);
 		}
 	}
 
@@ -230,11 +156,11 @@ class Affinity {
 		// todo: support pagination
 		const { mode, rankedStatus, genre, language, include, nsfw } = options;
 
-		if (await this.isLoggedIn()) {
+		if (await this.#auth.checkAuthentication()) {
 			// Make the request
 			const {
 				data: { beatmapsets },
-			}: { data: { beatmapsets: any[] } } = await this.#rest.get(
+			}: { data: { beatmapsets: any[] } } = await this.#auth.rest.get(
 				'beatmapsets/search',
 				{
 					params: {
@@ -250,7 +176,7 @@ class Affinity {
 			);
 
 			return beatmapsets.map(
-				(beatmapset) => new BeatmapSet(this, this.#token, beatmapset)
+				(beatmapset) => new BeatmapSet(this, this.#auth, beatmapset)
 			);
 		}
 	}
@@ -258,6 +184,7 @@ class Affinity {
 
 namespace Affinity {
 	export type Modes = 'osu' | 'ctb' | 'mania' | 'taiko';
+	export type LoginMethod = 'client' | 'user';
 
 	export interface Config {
 		defaultGamemode?: Modes;

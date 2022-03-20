@@ -3,13 +3,12 @@ import BeatmapSet from '~structures/BeatmapSet';
 import User from '~structures/User';
 import parseMode from '~functions/parseMode';
 import links from '~helpers/links';
-import createAxios from '~functions/createAxios';
-import { AxiosInstance } from 'axios';
-import Score from '~structures/Score';
+import AuthStrategy from '~auth/AuthStrategy';
+import { Score } from '../../../docs/typedocExports';
 
 class BeatmapCompact {
 	#client: Affinity;
-	#rest: AxiosInstance;
+	#auth: AuthStrategy;
 
 	public id: number;
 	public starRating: number;
@@ -20,9 +19,9 @@ class BeatmapCompact {
 	public mapperId: number;
 	public difficultyName: string;
 
-	constructor(client: Affinity, token: string, data: any) {
+	constructor(client: Affinity, auth: AuthStrategy, data: any) {
 		this.#client = client;
-		this.#rest = createAxios(token);
+		this.#auth = auth;
 
 		this.id = data?.id;
 		this.beatmapsetId = data?.beatmapsetId;
@@ -54,19 +53,19 @@ class BeatmapCompact {
 		return await this.#client.getBeatmapSet(this.beatmapsetId);
 	}
 
+	// todo: allow mod input
 	/**
 	 * Fetch the top 50 scores on the beatmap!
 	 */
 	public async fetchLeaderboard(): Promise<Score[]> {
-		console.log(this.mode);
-
 		const {
 			data: { scores },
-		}: { data: { scores: any[] } } = await this.#rest.get(
+		}: { data: { scores: any[] } } = await this.#auth.rest.get(
 			`beatmaps/${this.id}/scores`,
 			{
 				params: {
 					type: 'global',
+					mode: this.mode,
 				},
 			}
 		);

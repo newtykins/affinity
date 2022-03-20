@@ -1,6 +1,6 @@
 import Affinity from '~affinity';
 import User from '~structures/User';
-import Score from '~structures/Score';
+import Score from '~structures/scores/Score';
 import Beatmap from '~structures/beatmaps/Beatmap';
 import BeatmapCompact from '~structures/beatmaps/BeatmapCompact';
 import BeatmapSet from '~structures/BeatmapSet';

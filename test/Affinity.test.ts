@@ -1,3 +1,4 @@
+import ClientAuth from '~auth/ClientAuth';
 import Affinity from '~affinity';
 import AuthenticationError from '~errors/AuthenticationError';
 import BadRequestError from '~errors/BadRequestError';
@@ -12,8 +13,8 @@ describe('The Affinity Client', () => {
 	let newt: User;
 
 	beforeAll(async () => {
-		client = new Affinity(clientId, clientSecret);
-		maniaClient = new Affinity(clientId, clientSecret, {
+		client = new Affinity(new ClientAuth(clientId, clientSecret));
+		maniaClient = new Affinity(new ClientAuth(clientId, clientSecret), {
 			defaultGamemode: 'mania',
 		});
 

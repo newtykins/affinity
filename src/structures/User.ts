@@ -1,17 +1,15 @@
-import type { AxiosInstance } from 'axios';
-import createAxios from '~functions/createAxios';
 import Affinity from '~affinity';
 import BeatmapSet from './BeatmapSet';
 import BeatmapPlaycount from '~structures/beatmaps/BeatmapPlaycount';
 import links from '~helpers/links';
 import UserEvent from './events/Event';
+import AuthStrategy from '~auth/AuthStrategy';
 
 class User {
 	public rawData: any;
 	#client: Affinity;
-	#rest: AxiosInstance;
 	#mode: Affinity.Modes;
-	#token: string;
+	#auth: AuthStrategy;
 
 	public id: number;
 	public username: string;
@@ -36,15 +34,14 @@ class User {
 
 	constructor(
 		client: Affinity,
-		token: string,
+		auth: AuthStrategy,
 		mode: Affinity.Modes,
 		data: any
 	) {
 		this.rawData = data;
 		this.#client = client;
-		this.#rest = createAxios(token);
+		this.#auth = auth;
 		this.#mode = mode;
-		this.#token = token;
 
 		const { statistics } = data;
 
@@ -132,26 +129,34 @@ class User {
 	 * @async
 	 */
 	public async fetchBeatmaps<T extends User.BeatmapTypes = 'favourite'>(
-		type?: T
+		type?: T,
+		options?: Affinity.Options.Pagination
 	): Promise<T extends 'most_played' ? BeatmapPlaycount[] : BeatmapSet[]> {
 		// @ts-expect-error - ensure there is a type
 		type = type ?? 'favourite';
+		const { limit, offset } = options;
 
 		// Make the request
-		const { data }: { data: any[] } = await this.#rest.get(
-			`users/${this.id}/beatmapsets/${type}`
+		const { data }: { data: any[] } = await this.#auth.rest.get(
+			`users/${this.id}/beatmapsets/${type}`,
+			{
+				params: {
+					limit,
+					offset,
+				},
+			}
 		);
 
 		if (type === 'most_played') {
 			// @ts-expect-error
 			return data.map(
 				(beatmap) =>
-					new BeatmapPlaycount(this.#client, this.#token, beatmap)
+					new BeatmapPlaycount(this.#client, this.#auth, beatmap)
 			);
 		} else {
 			// @ts-expect-error
 			return data.map(
-				(beatmap) => new BeatmapSet(this.#client, this.#token, beatmap)
+				(beatmap) => new BeatmapSet(this.#client, this.#auth, beatmap)
 			);
 		}
 	}
@@ -163,7 +168,7 @@ class User {
 		const { maximum: limit, offset } = options;
 
 		// Make the request
-		const { data }: { data: UserEvent<T>[] } = await this.#rest.get(
+		const { data }: { data: UserEvent<T>[] } = await this.#auth.rest.get(
 			`users/${this.id}/recent_activity`,
 			{
 				params: {

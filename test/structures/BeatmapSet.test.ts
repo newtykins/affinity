@@ -1,3 +1,4 @@
+import ClientAuth from '~auth/ClientAuth';
 import Affinity from '~affinity';
 import BeatmapSet from '~structures/BeatmapSet';
 
@@ -6,7 +7,9 @@ describe('The Beatmap Set structure', () => {
 	let sinkIntoTheDeepSeaWorld: BeatmapSet;
 
 	beforeAll(async () => {
-		client = new Affinity(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
+		client = new Affinity(
+			new ClientAuth(process.env.CLIENT_ID, process.env.CLIENT_SECRET)
+		);
 
 		sinkIntoTheDeepSeaWorld = await client.getBeatmapSet(779495);
 	});

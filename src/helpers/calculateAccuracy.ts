@@ -1,5 +1,5 @@
 import Affinity from '~affinity';
-import Score from '~structures/Score';
+import Score from '~structures/scores/Score';
 
 type ManiaHitData = Score.Hits;
 type TaikoHitData = Omit<ManiaHitData, 'hit50'>;

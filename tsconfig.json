@@ -13,7 +13,8 @@
 			"~helpers/*": ["./helpers/*"],
 			"~affinity": ["./Affinity"],
 			"~errors/*": ["./errors/*"],
-			"~functions/*": ["./functions/*"]
+			"~functions/*": ["./functions/*"],
+			"~auth/*": ["./auth/*"]
 		},
 		"plugins": [{ "transform": "ts-transform-paths" }],
 		"declaration": true

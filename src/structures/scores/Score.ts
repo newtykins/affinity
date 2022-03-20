@@ -1,7 +1,7 @@
 import Affinity from '~affinity';
-import User from './User';
+import User from '~structures/User';
 import Beatmap from '~structures/beatmaps/Beatmap';
-import BeatmapSet from './BeatmapSet';
+import BeatmapSet from '~structures/BeatmapSet';
 import parseMode from '~functions/parseMode';
 import links from '~helpers/links';
 
